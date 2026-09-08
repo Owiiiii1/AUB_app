@@ -1,16 +1,34 @@
-# aub
+# AUB
 
-A new Flutter project.
+Mobile app for Accademia Umbra di Belle Arti (students, parents, teachers).
 
-## Getting Started
+Production API (not a secret): `https://aub.owlsolutions.net/api/v1`
 
-This project is a starting point for a Flutter application.
+## Run
 
-A few resources to get you started if this is your first Flutter project:
+```text
+flutter pub get
+flutter run
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+API override:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```text
+flutter run --dart-define=AUB_API_BASE_URL=https://example.test/api/v1
+```
+
+## Check
+
+```text
+flutter analyze
+flutter test
+flutter build apk --debug
+```
+
+## Docs
+
+- `docs/ARCHITECTURE.md`
+- `docs/API_INTEGRATION.md`
+- `docs/CURRENT_STATE.md`
+- `docs/DEVELOPMENT_RULES.md`
+- `docs/NEXT_STEPS.md`
