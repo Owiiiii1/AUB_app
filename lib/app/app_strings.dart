@@ -34,5 +34,16 @@ class AppStrings {
   static const noClassSchedule =
       'Nessuna classe assegnata. L\'orario non è disponibile.';
   static const noLessonsThisWeek = 'Nessuna lezione questa settimana';
+  static const attendance = 'Presenze';
+  static const present = 'Presente';
+  static const absent = 'Assente';
+  static const excused = 'Giustificato';
+  static const markAllPresent = 'Segna tutti presenti';
+  static const saveAttendance = 'Salva';
+  static const attendanceSaved = 'Salvato';
+  static const lessonCancelled = 'Lezione annullata';
+  static const unsavedAttendance = 'Hai modifiche non salvate.\nUscire senza salvare?';
+  static const cancel = 'Annulla';
+  static const leaveWithoutSaving = 'Esci';
   static String scheduleOf(String name) => 'Orario di $name';
 }

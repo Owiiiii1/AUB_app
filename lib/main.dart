@@ -6,6 +6,8 @@ import 'package:aub/core/api/api_client.dart';
 import 'package:aub/core/storage/secure_token_storage.dart';
 import 'package:aub/features/auth/data/auth_repository.dart';
 import 'package:aub/features/auth/state/auth_controller.dart';
+import 'package:aub/features/attendance/data/attendance_api.dart';
+import 'package:aub/features/attendance/data/attendance_repository.dart';
 import 'package:aub/features/schedule/data/schedule_api.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 
@@ -25,11 +27,13 @@ void main() {
   final controller = AuthController(repository: repository);
   apiClient.onUnauthorized = controller.handleUnauthorized;
   final scheduleRepository = ScheduleRepository(api: ScheduleApi(apiClient));
+  final attendanceRepository = AttendanceRepository(api: AttendanceApi(apiClient));
 
   runApp(
     AubApp(
       controller: controller,
       scheduleRepository: scheduleRepository,
+      attendanceRepository: attendanceRepository,
     ),
   );
 }

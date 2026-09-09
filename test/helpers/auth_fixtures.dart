@@ -2,6 +2,8 @@ import 'package:aub/app/app_config.dart';
 import 'package:aub/core/api/api_client.dart';
 import 'package:aub/features/auth/data/auth_repository.dart';
 import 'package:aub/features/auth/state/auth_controller.dart';
+import 'package:aub/features/attendance/data/attendance_api.dart';
+import 'package:aub/features/attendance/data/attendance_repository.dart';
 import 'package:aub/features/schedule/data/schedule_api.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 import 'fake_auth_api.dart';
@@ -89,6 +91,7 @@ AuthHarness createHarness({String? storedToken}) {
   final controller = AuthController(repository: repository);
   apiClient.onUnauthorized = controller.handleUnauthorized;
   final scheduleRepository = ScheduleRepository(api: ScheduleApi(apiClient));
+  final attendanceRepository = AttendanceRepository(api: AttendanceApi(apiClient));
   return AuthHarness(
     apiClient: apiClient,
     storage: storage,
@@ -96,6 +99,7 @@ AuthHarness createHarness({String? storedToken}) {
     repository: repository,
     controller: controller,
     scheduleRepository: scheduleRepository,
+    attendanceRepository: attendanceRepository,
   );
 }
 
@@ -107,6 +111,7 @@ class AuthHarness {
     required this.repository,
     required this.controller,
     required this.scheduleRepository,
+    required this.attendanceRepository,
   });
 
   final ApiClient apiClient;
@@ -115,4 +120,5 @@ class AuthHarness {
   final AuthRepository repository;
   final AuthController controller;
   final ScheduleRepository scheduleRepository;
+  final AttendanceRepository attendanceRepository;
 }

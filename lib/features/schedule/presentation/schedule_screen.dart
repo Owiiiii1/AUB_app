@@ -12,10 +12,12 @@ class ScheduleScreen extends StatefulWidget {
     super.key,
     required this.controller,
     this.childName,
+    this.onLessonTap,
   });
 
   final ScheduleController controller;
   final String? childName;
+  final ValueChanged<ScheduleLesson>? onLessonTap;
 
   @override
   State<ScheduleScreen> createState() => _ScheduleScreenState();
@@ -113,7 +115,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(banner, textAlign: TextAlign.center),
             ),
-          ...view.days.map((day) => ScheduleDaySection(day: day)),
+          ...view.days.map(
+            (day) => ScheduleDaySection(
+              day: day,
+              onLessonTap: widget.onLessonTap,
+            ),
+          ),
         ],
       ),
     );

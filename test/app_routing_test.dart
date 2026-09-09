@@ -14,6 +14,8 @@ import 'package:aub/app/app_config.dart';
 import 'package:aub/core/api/api_client.dart';
 import 'package:aub/features/auth/data/auth_repository.dart';
 import 'package:aub/features/auth/state/auth_controller.dart';
+import 'package:aub/features/attendance/data/attendance_api.dart';
+import 'package:aub/features/attendance/data/attendance_repository.dart';
 import 'package:aub/features/schedule/data/schedule_api.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 
@@ -33,6 +35,7 @@ void main() {
       AubApp(
         controller: controller,
         scheduleRepository: ScheduleRepository(api: ScheduleApi(apiClient)),
+        attendanceRepository: AttendanceRepository(api: AttendanceApi(apiClient)),
       ),
     );
 
@@ -47,6 +50,7 @@ void main() {
       AubApp(
         controller: harness.controller,
         scheduleRepository: harness.scheduleRepository,
+        attendanceRepository: harness.attendanceRepository,
       ),
     );
     await tester.pumpAndSettle();
@@ -62,6 +66,7 @@ void main() {
       AubApp(
         controller: harness.controller,
         scheduleRepository: harness.scheduleRepository,
+        attendanceRepository: harness.attendanceRepository,
       ),
     );
     await tester.pumpAndSettle();
@@ -79,6 +84,7 @@ void main() {
       AubApp(
         controller: harness.controller,
         scheduleRepository: harness.scheduleRepository,
+        attendanceRepository: harness.attendanceRepository,
       ),
     );
     await tester.pumpAndSettle();
@@ -96,6 +102,7 @@ void main() {
       AubApp(
         controller: harness.controller,
         scheduleRepository: harness.scheduleRepository,
+        attendanceRepository: harness.attendanceRepository,
       ),
     );
     await tester.pumpAndSettle();

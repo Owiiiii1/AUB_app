@@ -30,6 +30,8 @@ Release builds refuse a non-HTTPS base URL. TLS certificate validation is not di
 | GET | `/schedule` | Bearer, student |
 | GET | `/children/{student}/schedule` | Bearer, parent |
 | GET | `/teacher/schedule` | Bearer, teacher |
+| GET | `/teacher/lessons/{id}/attendance` | Bearer, teacher |
+| PUT | `/teacher/lessons/{id}/attendance` | Bearer, teacher |
 | POST | `/auth/logout` | Bearer |
 | POST | `/auth/logout-all` | Implemented in `AuthApi`, not used by UI yet |
 
@@ -70,7 +72,7 @@ The login request does not send `Authorization`. A 401 from login does **not** s
 }
 ```
 
-Mapped to `ApiException` (`invalid_credentials`, `validation_error`, `unauthenticated`, `forbidden`, `not_found`, `too_many_requests`, `server_error`, plus `network` and `timeout` from Dio/socket failures). UI shows Italian strings from `AuthMessages`, never developer/API messages.
+Mapped to `ApiException` (`invalid_credentials`, `validation_error`, `unauthenticated`, `forbidden`, `not_found`, `too_many_requests`, `attendance_not_editable`, `server_error`, plus `network` and `timeout` from Dio/socket failures). UI shows Italian strings from `AuthMessages`, never developer/API messages.
 
 ## Actor routing
 
@@ -91,5 +93,5 @@ The backend converts any date to Monday–Sunday. Flutter sends a date; it does 
 
 Visible lesson statuses: `published`, `cancelled`, `moved`. Cancelled is muted/strikethrough (`Annullata`). Moved shows a `Spostata` badge with the current time from the payload.
 
-In-memory cache only for the session. Nothing written to disk.
+Teacher attendance: `GET`/`PUT /teacher/lessons/{id}/attendance`. Identity is Student + ScheduledLesson. PUT is bulk partial upsert; `status: null` removes a mark. No disk cache; each screen open GETs fresh data. Italian labels only (`Presente` / `Assente` / `Giustificato`).
 

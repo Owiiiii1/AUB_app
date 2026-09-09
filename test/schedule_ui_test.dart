@@ -110,6 +110,7 @@ void main() {
       AubApp(
         controller: harness.controller,
         scheduleRepository: harness.scheduleRepository,
+        attendanceRepository: harness.attendanceRepository,
       ),
     );
     await tester.pumpAndSettle();

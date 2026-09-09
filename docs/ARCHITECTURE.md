@@ -1,6 +1,6 @@
 # Architecture
 
-AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student/parent/teacher schedule**.
+AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student/parent/teacher schedule** and **teacher attendance**.
 
 ## Layers
 
@@ -15,6 +15,7 @@ AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation
 | `lib/features/auth/presentation` | Splash, login, offline-restore |
 | `lib/features/home/presentation` | Actor home placeholders + Orario entry |
 | `lib/features/schedule` | API, repository, week state, schedule screen |
+| `lib/features/attendance` | Teacher roster, marks, dirty/save |
 
 UI never calls HTTP. UI never reads the token. Presentation talks to `AuthController` / `ScheduleController`.
 
@@ -78,6 +79,19 @@ lib/
         widgets/
           schedule_widgets.dart
       schedule_kind.dart
+    attendance/
+      data/
+        attendance_api.dart
+        attendance_repository.dart
+      models/
+        attendance_models.dart
+      state/
+        attendance_controller.dart
+        attendance_state.dart
+      presentation/
+        attendance_screen.dart
+        widgets/
+          attendance_widgets.dart
 ```
 
 ## Runtime graph
@@ -90,6 +104,7 @@ main()
   AuthRepository
   AuthController
   ScheduleRepository (in-memory week cache)
+  AttendanceRepository (no disk cache)
   apiClient.onUnauthorized → controller.handleUnauthorized
   AubApp
 ```
@@ -101,4 +116,4 @@ main()
 `initializing` → splash  
 `unauthenticated` / `authenticating` → login  
 `restoreFailed` → retry (token kept)  
-`authenticated` → actor home → **Orario** (student own class / parent one child / teacher own lessons)
+`authenticated` → actor home → **Orario** (student own class / parent one child / teacher own lessons). Teacher lesson tap → **Presenze**.

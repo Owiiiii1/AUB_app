@@ -5,6 +5,7 @@ enum ApiErrorCode {
   forbidden,
   notFound,
   tooManyRequests,
+  attendanceNotEditable,
   serverError,
   network,
   timeout,
@@ -39,6 +40,7 @@ class ApiException implements Exception {
       'forbidden' => ApiErrorCode.forbidden,
       'not_found' => ApiErrorCode.notFound,
       'too_many_requests' => ApiErrorCode.tooManyRequests,
+      'attendance_not_editable' => ApiErrorCode.attendanceNotEditable,
       'server_error' => ApiErrorCode.serverError,
       _ => ApiErrorCode.unknown,
     };

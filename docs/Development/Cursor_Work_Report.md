@@ -2,47 +2,37 @@
 
 ## Task
 
-Add Flutter **Teacher Schedule (Orario)** in `Owiiiii1/AUB_app` after the production `GET /teacher/schedule` API. Reuse `features/schedule`. Student/Parent Orario unchanged.
+Add Flutter **Teacher Attendance (Presenze)** in `Owiiiii1/AUB_app` after the production Teacher Attendance API.
 
-## Architecture
+## UX
 
-One schedule feature, three `ScheduleKind` values: `student`, `child`, `teacher`.
+Teacher Orario lesson card is tappable (chevron). Student/Parent cards are not.
 
-- `ScheduleApi.teacherWeek()` → `/teacher/schedule`
-- `ScheduleRepository` cache keys: `self|…`, `{childId}|…`, `teacher|…`
-- `ScheduleController` takes `kind` + optional `studentId`
-- Shared `ScheduleScreen` / week header / status badges
-- Teacher Home **Orario** → **Il mio orario**
-- Lesson `academyClass?` is nullable so Student/Parent JSON still parses
+Header: title, class, `16:00 – 17:30`, room. Roster chips: **Presente** / **Assente** / **Giustificato**. **Segna tutti presenti** is local only until **Salva**. Salva disabled when clean. Unsaved back: `Hai modifiche non salvate. Uscire senza salvare?`. Cancelled: badge `Lezione annullata`, chips disabled, no Salva. PUT/network failure keeps local marks and dirty=true. 401 uses global auth handling. No disk cache; reopen always GETs.
 
-## Screens / state
+## State
 
-Same `loading` / `loaded` / `unpublished` / `error`. Teacher cards show class + `building · room`. Cancelled `Annullata`, moved `Spostata`. Empty published week: `Nessuna lezione questa settimana`. Today highlight unchanged. In-memory cache only.
+`AttendanceController` holds the GET roster as source of truth plus a draft map. Dirty = draft differs from saved marks. Save sends only changed rows (bulk partial upsert). Success response replaces roster; dirty=false; compact `Salvato` text.
 
 ## Tests
-
-- Parsing: teacher week, two classes, cancelled/moved, empty, malformed
-- Controller: teacher endpoint, cache isolation, unpublished, network error
-- UI: Teacher Home Orario, Il mio orario, academy class, empty copy
-- Existing auth + student/parent schedule tests remain
 
 Results:
 
 - `flutter pub get` — PASS
 - `flutter analyze` — PASS (No issues found)
-- `flutter test` — PASS, **43** tests
+- `flutter test` — PASS, **58** tests (previous 43 + attendance parsing/controller/UI)
 - `flutter build apk --debug` — PASS (`build\app\outputs\flutter-apk\app-debug.apk`)
 
 ## E2E
 
-Backend production smoke already used `teacher@admin.com`: current week unpublished 200; isolated `2026-12-28` published with `LEZIONE CLASSICO` / `Mobile Test`; student token 403. Widget tests cover Teacher Home → Orario and schedule rendering. Device/emulator walkthrough is the remaining manual check on a debug APK.
+Backend production smoke already verified isolated lesson id **2** / student **8**: present → absent → unmarked, student 403, row cleaned. Widget tests cover roster, chips, mark-all, cancelled read-only, dirty back dialog, teacher chevron vs student card. Device walkthrough on a debug APK is the remaining manual check (`teacher@admin.com`, week `2026-12-28`).
 
 ## Files
 
-Created: `lib/features/schedule/schedule_kind.dart`.
+Created: `lib/features/attendance/**`, attendance tests/helpers.
 
-Modified: schedule models/api/repository/controller/UI, Teacher Home, `AubApp`, strings, tests, docs.
+Modified: `ApiClient.put`, `ApiErrorCode.attendanceNotEditable`, schedule tiles (teacher tap), `AubApp` / `main`, strings, docs.
 
 ## Out of scope
 
-Attendance, roster, check-in, notes, substitutes, editing, push, persistent cache.
+Student/Parent attendance history, percentages, notifications, late, comments, admin dashboard, check-in, roster snapshots, finalization lock.

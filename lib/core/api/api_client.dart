@@ -76,6 +76,13 @@ class ApiClient {
     );
   }
 
+  Future<Map<String, dynamic>> put(
+    String path, {
+    Map<String, dynamic>? body,
+  }) {
+    return _send(() => _dio.put<dynamic>(path, data: body));
+  }
+
   Future<Map<String, dynamic>> _send(
     Future<Response<dynamic>> Function() request, {
     bool skipUnauthorizedHandler = false,
@@ -173,6 +180,7 @@ class ApiClient {
         404 => ApiErrorCode.notFound,
         422 => ApiErrorCode.validationError,
         429 => ApiErrorCode.tooManyRequests,
+        409 => ApiErrorCode.attendanceNotEditable,
         _ => ApiErrorCode.serverError,
       };
     }

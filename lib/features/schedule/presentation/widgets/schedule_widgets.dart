@@ -56,9 +56,14 @@ class ScheduleWeekHeader extends StatelessWidget {
 }
 
 class ScheduleDaySection extends StatelessWidget {
-  const ScheduleDaySection({super.key, required this.day});
+  const ScheduleDaySection({
+    super.key,
+    required this.day,
+    this.onLessonTap,
+  });
 
   final ScheduleDay day;
+  final ValueChanged<ScheduleLesson>? onLessonTap;
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +98,12 @@ class ScheduleDaySection extends StatelessWidget {
                     ),
               )
             else
-              ...day.lessons.map((lesson) => ScheduleLessonTile(lesson: lesson)),
+              ...day.lessons.map(
+                (lesson) => ScheduleLessonTile(
+                  lesson: lesson,
+                  onTap: onLessonTap == null ? null : () => onLessonTap!(lesson),
+                ),
+              ),
           ],
         ),
       ),
@@ -102,9 +112,10 @@ class ScheduleDaySection extends StatelessWidget {
 }
 
 class ScheduleLessonTile extends StatelessWidget {
-  const ScheduleLessonTile({super.key, required this.lesson});
+  const ScheduleLessonTile({super.key, required this.lesson, this.onTap});
 
   final ScheduleLesson lesson;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +131,7 @@ class ScheduleLessonTile extends StatelessWidget {
     ].join(' · ');
     final showClass = className != null && className.isNotEmpty;
 
-    return Padding(
+    final tile = Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -140,6 +151,11 @@ class ScheduleLessonTile extends StatelessWidget {
               if (cancelled)
                 const _StatusBadge(label: AppStrings.cancelled, muted: true),
               if (moved) const _StatusBadge(label: AppStrings.moved),
+              if (onTap != null)
+                Icon(
+                  Icons.chevron_right,
+                  color: Theme.of(context).hintColor,
+                ),
             ],
           ),
           Text(
@@ -159,6 +175,15 @@ class ScheduleLessonTile extends StatelessWidget {
             Text(teacher, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
+    );
+
+    if (onTap == null) {
+      return tile;
+    }
+
+    return InkWell(
+      onTap: onTap,
+      child: tile,
     );
   }
 }
