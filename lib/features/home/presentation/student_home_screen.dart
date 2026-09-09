@@ -9,11 +9,13 @@ class StudentHomeScreen extends StatelessWidget {
     required this.profile,
     required this.onLogout,
     this.onOpenSchedule,
+    this.onOpenAttendance,
   });
 
   final StudentProfile profile;
   final VoidCallback onLogout;
   final VoidCallback? onOpenSchedule;
+  final VoidCallback? onOpenAttendance;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +54,11 @@ class StudentHomeScreen extends StatelessWidget {
           FilledButton(
             onPressed: onOpenSchedule,
             child: const Text(AppStrings.schedule),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton(
+            onPressed: onOpenAttendance,
+            child: const Text(AppStrings.attendance),
           ),
         ],
       ),

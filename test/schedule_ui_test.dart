@@ -111,6 +111,7 @@ void main() {
         controller: harness.controller,
         scheduleRepository: harness.scheduleRepository,
         attendanceRepository: harness.attendanceRepository,
+        attendanceHistoryRepository: harness.attendanceHistoryRepository,
       ),
     );
     await tester.pumpAndSettle();

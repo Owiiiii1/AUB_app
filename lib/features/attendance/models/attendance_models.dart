@@ -172,3 +172,155 @@ AttendanceNamedRef? _refOrNull(dynamic value) {
   }
   return null;
 }
+
+class AttendancePersonRef {
+  const AttendancePersonRef({required this.id, required this.displayName});
+
+  final int id;
+  final String displayName;
+
+  factory AttendancePersonRef.fromJson(Map<String, dynamic> json) {
+    return AttendancePersonRef(
+      id: json['id'] as int,
+      displayName: json['display_name'] as String,
+    );
+  }
+}
+
+class AttendancePeriod {
+  const AttendancePeriod({
+    required this.month,
+    required this.startsOn,
+    required this.endsOn,
+  });
+
+  final String month;
+  final String startsOn;
+  final String endsOn;
+
+  factory AttendancePeriod.fromJson(Map<String, dynamic> json) {
+    return AttendancePeriod(
+      month: json['month'] as String,
+      startsOn: json['starts_on'] as String,
+      endsOn: json['ends_on'] as String,
+    );
+  }
+}
+
+class AttendanceSummary {
+  const AttendanceSummary({
+    required this.marked,
+    required this.present,
+    required this.absent,
+    required this.excused,
+  });
+
+  final int marked;
+  final int present;
+  final int absent;
+  final int excused;
+
+  factory AttendanceSummary.fromJson(Map<String, dynamic> json) {
+    return AttendanceSummary(
+      marked: json['marked'] as int,
+      present: json['present'] as int,
+      absent: json['absent'] as int,
+      excused: json['excused'] as int,
+    );
+  }
+}
+
+class AttendanceHistoryRecord {
+  const AttendanceHistoryRecord({
+    required this.id,
+    required this.date,
+    required this.startsAt,
+    required this.endsAt,
+    required this.status,
+    required this.title,
+    this.lesson,
+    this.teacher,
+    this.location,
+  });
+
+  final int id;
+  final String date;
+  final String startsAt;
+  final String endsAt;
+  final AttendanceStatus status;
+  final String title;
+  final AttendanceNamedRef? lesson;
+  final AttendancePersonRef? teacher;
+  final AttendanceLocation? location;
+
+  factory AttendanceHistoryRecord.fromJson(Map<String, dynamic> json) {
+    return AttendanceHistoryRecord(
+      id: json['id'] as int,
+      date: json['date'] as String,
+      startsAt: json['starts_at'] as String,
+      endsAt: json['ends_at'] as String,
+      status: AttendanceStatus.parse(json['status'] as String?),
+      title: json['title'] as String,
+      lesson: _refOrNull(json['lesson']),
+      teacher: json['teacher'] is Map
+          ? AttendancePersonRef.fromJson(
+              Map<String, dynamic>.from(json['teacher'] as Map),
+            )
+          : null,
+      location: json['location'] is Map
+          ? AttendanceLocation.fromJson(
+              Map<String, dynamic>.from(json['location'] as Map),
+            )
+          : null,
+    );
+  }
+}
+
+class AttendanceHistory {
+  const AttendanceHistory({
+    required this.student,
+    required this.period,
+    required this.summary,
+    required this.records,
+  });
+
+  final AttendancePersonRef student;
+  final AttendancePeriod period;
+  final AttendanceSummary summary;
+  final List<AttendanceHistoryRecord> records;
+
+  factory AttendanceHistory.fromJson(Map<String, dynamic> json) {
+    final studentJson = json['student'];
+    final periodJson = json['period'];
+    final summaryJson = json['summary'];
+    final recordsJson = json['records'];
+    if (studentJson is! Map ||
+        periodJson is! Map ||
+        summaryJson is! Map ||
+        recordsJson is! List) {
+      throw const FormatException('Malformed attendance history payload.');
+    }
+    final records = <AttendanceHistoryRecord>[];
+    for (final item in recordsJson) {
+      if (item is! Map) {
+        throw const FormatException('Malformed attendance history payload.');
+      }
+      records.add(
+        AttendanceHistoryRecord.fromJson(Map<String, dynamic>.from(item)),
+      );
+    }
+    return AttendanceHistory(
+      student: AttendancePersonRef.fromJson(
+        Map<String, dynamic>.from(studentJson),
+      ),
+      period: AttendancePeriod.fromJson(
+        Map<String, dynamic>.from(periodJson),
+      ),
+      summary: AttendanceSummary.fromJson(
+        Map<String, dynamic>.from(summaryJson),
+      ),
+      records: records,
+    );
+  }
+}
+

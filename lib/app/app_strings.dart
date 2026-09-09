@@ -38,6 +38,13 @@ class AppStrings {
   static const present = 'Presente';
   static const absent = 'Assente';
   static const excused = 'Giustificato';
+  static const presentPlural = 'Presenti';
+  static const absentPlural = 'Assenti';
+  static const excusedPlural = 'Giustificati';
+  static const totalLabel = 'Totale';
+  static const thisMonth = 'Questo mese';
+  static const noAttendanceThisMonth =
+      'Nessuna presenza registrata questo mese.';
   static const markAllPresent = 'Segna tutti presenti';
   static const saveAttendance = 'Salva';
   static const attendanceSaved = 'Salvato';
@@ -46,4 +53,5 @@ class AppStrings {
   static const cancel = 'Annulla';
   static const leaveWithoutSaving = 'Esci';
   static String scheduleOf(String name) => 'Orario di $name';
+  static String attendanceOf(String name) => 'Presenze di $name';
 }

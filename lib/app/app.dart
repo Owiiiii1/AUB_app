@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:aub/app/app_strings.dart';
+import 'package:aub/features/attendance/data/attendance_history_repository.dart';
 import 'package:aub/features/attendance/data/attendance_repository.dart';
+import 'package:aub/features/attendance/presentation/attendance_history_screen.dart';
 import 'package:aub/features/attendance/presentation/attendance_screen.dart';
 import 'package:aub/features/attendance/state/attendance_controller.dart';
+import 'package:aub/features/attendance/state/attendance_history_controller.dart';
 import 'package:aub/features/auth/models/actor_profile.dart';
 import 'package:aub/features/auth/presentation/login_screen.dart';
 import 'package:aub/features/auth/presentation/restore_failed_screen.dart';
@@ -24,12 +27,14 @@ class AubApp extends StatefulWidget {
     required this.controller,
     required this.scheduleRepository,
     required this.attendanceRepository,
+    required this.attendanceHistoryRepository,
     this.restoreOnStart = true,
   });
 
   final AuthController controller;
   final ScheduleRepository scheduleRepository;
   final AttendanceRepository attendanceRepository;
+  final AttendanceHistoryRepository attendanceHistoryRepository;
   final bool restoreOnStart;
 
   @override
@@ -91,6 +96,7 @@ class _AubAppState extends State<AubApp> {
           profile: profile,
           onLogout: onLogout,
           onOpenSchedule: () => _openSchedule(context),
+          onOpenAttendance: () => _openAttendanceHistory(context),
         ),
       ParentProfile profile => ParentHomeScreen(
           profile: profile,
@@ -98,6 +104,11 @@ class _AubAppState extends State<AubApp> {
           onOpenChildSchedule: (child) => _openSchedule(
             context,
             kind: ScheduleKind.child,
+            studentId: child.id,
+            childName: child.displayName,
+          ),
+          onOpenChildAttendance: (child) => _openAttendanceHistory(
+            context,
             studentId: child.id,
             childName: child.displayName,
           ),
@@ -141,6 +152,24 @@ class _AubAppState extends State<AubApp> {
             repository: widget.attendanceRepository,
             lessonId: lesson.id,
           ),
+        ),
+      ),
+    );
+  }
+
+  void _openAttendanceHistory(
+    BuildContext context, {
+    int? studentId,
+    String? childName,
+  }) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => AttendanceHistoryScreen(
+          controller: AttendanceHistoryController(
+            repository: widget.attendanceHistoryRepository,
+            studentId: studentId,
+          ),
+          childName: childName,
         ),
       ),
     );

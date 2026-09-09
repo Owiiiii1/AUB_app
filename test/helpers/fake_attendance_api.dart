@@ -14,11 +14,16 @@ class FakeAttendanceApi extends AttendanceApi {
         );
 
   AttendanceRoster? roster;
+  AttendanceHistory? history;
   Object? throwOnLoad;
   Object? throwOnSave;
+  Object? throwOnHistory;
   List<AttendanceWrite>? lastSave;
+  String? lastHistoryMonth;
+  int? lastHistoryStudentId;
   int loads = 0;
   int saves = 0;
+  int historyLoads = 0;
 
   @override
   Future<AttendanceRoster> show(int lessonId) async {
@@ -40,5 +45,30 @@ class FakeAttendanceApi extends AttendanceApi {
       throw throwOnSave!;
     }
     return roster!;
+  }
+
+  @override
+  Future<AttendanceHistory> loadStudentAttendance({String? month}) async {
+    historyLoads += 1;
+    lastHistoryMonth = month;
+    lastHistoryStudentId = null;
+    if (throwOnHistory != null) {
+      throw throwOnHistory!;
+    }
+    return history!;
+  }
+
+  @override
+  Future<AttendanceHistory> loadChildAttendance({
+    required int studentId,
+    String? month,
+  }) async {
+    historyLoads += 1;
+    lastHistoryMonth = month;
+    lastHistoryStudentId = studentId;
+    if (throwOnHistory != null) {
+      throw throwOnHistory!;
+    }
+    return history!;
   }
 }

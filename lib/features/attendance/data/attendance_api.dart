@@ -37,4 +37,23 @@ class AttendanceApi {
     );
     return AttendanceRoster.fromJson(data);
   }
+
+  Future<AttendanceHistory> loadStudentAttendance({String? month}) async {
+    final data = await _client.get(
+      '/attendance',
+      query: month == null ? null : {'month': month},
+    );
+    return AttendanceHistory.fromJson(data);
+  }
+
+  Future<AttendanceHistory> loadChildAttendance({
+    required int studentId,
+    String? month,
+  }) async {
+    final data = await _client.get(
+      '/children/$studentId/attendance',
+      query: month == null ? null : {'month': month},
+    );
+    return AttendanceHistory.fromJson(data);
+  }
 }

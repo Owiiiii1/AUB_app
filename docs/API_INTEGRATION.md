@@ -32,6 +32,8 @@ Release builds refuse a non-HTTPS base URL. TLS certificate validation is not di
 | GET | `/teacher/schedule` | Bearer, teacher |
 | GET | `/teacher/lessons/{id}/attendance` | Bearer, teacher |
 | PUT | `/teacher/lessons/{id}/attendance` | Bearer, teacher |
+| GET | `/attendance` | Bearer, student |
+| GET | `/children/{student}/attendance` | Bearer, parent |
 | POST | `/auth/logout` | Bearer |
 | POST | `/auth/logout-all` | Implemented in `AuthApi`, not used by UI yet |
 

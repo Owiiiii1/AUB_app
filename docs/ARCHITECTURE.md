@@ -1,6 +1,6 @@
 # Architecture
 
-AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student/parent/teacher schedule** and **teacher attendance**.
+AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student/parent/teacher schedule**, **teacher attendance marking**, and **student/parent attendance history**.
 
 ## Layers
 
@@ -13,11 +13,11 @@ AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation
 | `lib/features/auth/models` | Typed `/me` and login models |
 | `lib/features/auth/state` | `AuthController` / `AuthState` |
 | `lib/features/auth/presentation` | Splash, login, offline-restore |
-| `lib/features/home/presentation` | Actor home placeholders + Orario entry |
+| `lib/features/home/presentation` | Actor home + Orario / Presenze entry |
 | `lib/features/schedule` | API, repository, week state, schedule screen |
-| `lib/features/attendance` | Teacher roster, marks, dirty/save |
+| `lib/features/attendance` | Teacher marking + Student/Parent month history |
 
-UI never calls HTTP. UI never reads the token. Presentation talks to `AuthController` / `ScheduleController`.
+UI never calls HTTP. UI never reads the token. Presentation talks to `AuthController` / `ScheduleController` / attendance controllers.
 
 There is no Riverpod, Bloc, GetX, or Provider. `AuthController` is a `ChangeNotifier`.
 
@@ -83,13 +83,17 @@ lib/
       data/
         attendance_api.dart
         attendance_repository.dart
+        attendance_history_repository.dart
       models/
         attendance_models.dart
       state/
         attendance_controller.dart
         attendance_state.dart
+        attendance_history_controller.dart
+        attendance_history_state.dart
       presentation/
         attendance_screen.dart
+        attendance_history_screen.dart
         widgets/
           attendance_widgets.dart
 ```
@@ -105,6 +109,7 @@ main()
   AuthController
   ScheduleRepository (in-memory week cache)
   AttendanceRepository (no disk cache)
+  AttendanceHistoryRepository (in-memory month cache, no disk)
   apiClient.onUnauthorized → controller.handleUnauthorized
   AubApp
 ```
@@ -116,4 +121,4 @@ main()
 `initializing` → splash  
 `unauthenticated` / `authenticating` → login  
 `restoreFailed` → retry (token kept)  
-`authenticated` → actor home → **Orario** (student own class / parent one child / teacher own lessons). Teacher lesson tap → **Presenze**.
+`authenticated` → actor home → **Orario** / **Presenze** (student own / parent one child / teacher own lessons). Teacher lesson tap → marking **Presenze**.

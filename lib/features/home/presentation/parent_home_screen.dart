@@ -8,11 +8,13 @@ class ParentHomeScreen extends StatelessWidget {
     required this.profile,
     required this.onLogout,
     this.onOpenChildSchedule,
+    this.onOpenChildAttendance,
   });
 
   final ParentProfile profile;
   final VoidCallback onLogout;
   final ValueChanged<ParentChild>? onOpenChildSchedule;
+  final ValueChanged<ParentChild>? onOpenChildAttendance;
 
   @override
   Widget build(BuildContext context) {
@@ -43,16 +45,38 @@ class ParentHomeScreen extends StatelessWidget {
             const Text('—')
           else
             ...profile.children.map(
-              (child) => ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(child.displayName),
-                subtitle: Text(
-                  '${AppStrings.classLabel}: ${child.academyClass?.name ?? AppStrings.noClass}',
+              (child) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      child.displayName,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Text(
+                      '${AppStrings.classLabel}: ${child.academyClass?.name ?? AppStrings.noClass}',
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        FilledButton(
+                          onPressed: onOpenChildSchedule == null
+                              ? null
+                              : () => onOpenChildSchedule!(child),
+                          child: const Text(AppStrings.schedule),
+                        ),
+                        const SizedBox(width: 8),
+                        OutlinedButton(
+                          onPressed: onOpenChildAttendance == null
+                              ? null
+                              : () => onOpenChildAttendance!(child),
+                          child: const Text(AppStrings.attendance),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                trailing: const Text(AppStrings.schedule),
-                onTap: onOpenChildSchedule == null
-                    ? null
-                    : () => onOpenChildSchedule!(child),
               ),
             ),
         ],
