@@ -1,13 +1,17 @@
+import 'package:aub/app/app.dart';
 import 'package:aub/app/app_strings.dart';
+import 'package:aub/features/home/presentation/teacher_home_screen.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 import 'package:aub/features/schedule/models/schedule_week.dart';
 import 'package:aub/features/schedule/presentation/schedule_screen.dart';
 import 'package:aub/features/schedule/presentation/widgets/schedule_widgets.dart';
+import 'package:aub/features/schedule/schedule_kind.dart';
 import 'package:aub/features/schedule/state/schedule_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
+import 'helpers/auth_fixtures.dart';
 import 'helpers/fake_schedule_api.dart';
 import 'helpers/schedule_fixtures.dart';
 
@@ -38,6 +42,7 @@ void main() {
       ..responses['current'] = ScheduleWeekView.fromJson(publishedScheduleJson());
     final controller = ScheduleController(
       repository: ScheduleRepository(api: api),
+      kind: ScheduleKind.child,
       studentId: 1,
     );
 
@@ -96,5 +101,58 @@ void main() {
 
     expect(find.text('Annullata'), findsOneWidget);
     expect(find.text('Spostata'), findsOneWidget);
+  });
+
+  testWidgets('teacher home shows Orario', (tester) async {
+    final harness = createHarness(storedToken: 'token');
+    harness.authApi.meJson = teacherMeJson();
+    await tester.pumpWidget(
+      AubApp(
+        controller: harness.controller,
+        scheduleRepository: harness.scheduleRepository,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TeacherHomeScreen), findsOneWidget);
+    expect(find.text('Orario'), findsOneWidget);
+  });
+
+  testWidgets('teacher schedule shows class and title', (tester) async {
+    final api = FakeScheduleApi()
+      ..responses['current'] = ScheduleWeekView.fromJson(teacherScheduleJson());
+    final controller = ScheduleController(
+      repository: ScheduleRepository(api: api),
+      kind: ScheduleKind.teacher,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(home: ScheduleScreen(controller: controller)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Il mio orario'), findsOneWidget);
+    expect(find.text('Classe A'), findsOneWidget);
+    expect(find.text('Danza classica'), findsOneWidget);
+    expect(find.textContaining('Sala 2'), findsOneWidget);
+    expect(find.text(AppStrings.thisWeek), findsOneWidget);
+  });
+
+  testWidgets('teacher empty published week shows no lessons copy', (tester) async {
+    final api = FakeScheduleApi()
+      ..responses['current'] = ScheduleWeekView.fromJson(
+        teacherEmptyScheduleJson(published: true),
+      );
+    final controller = ScheduleController(
+      repository: ScheduleRepository(api: api),
+      kind: ScheduleKind.teacher,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(home: ScheduleScreen(controller: controller)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.noLessonsThisWeek), findsOneWidget);
   });
 }

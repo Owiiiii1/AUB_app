@@ -69,6 +69,7 @@ class ScheduleLesson {
     required this.status,
     this.lesson,
     this.teacher,
+    this.academyClass,
     this.location,
   });
 
@@ -79,6 +80,7 @@ class ScheduleLesson {
   final ScheduleLessonStatus status;
   final ScheduleNamedRef? lesson;
   final ScheduleTeacherRef? teacher;
+  final ScheduleNamedRef? academyClass;
   final ScheduleLocation? location;
 
   factory ScheduleLesson.fromJson(Map<String, dynamic> json) {
@@ -92,6 +94,7 @@ class ScheduleLesson {
       teacher: json['teacher'] is Map
           ? ScheduleTeacherRef.fromJson(Map<String, dynamic>.from(json['teacher'] as Map))
           : null,
+      academyClass: _refOrNull(json['academy_class']),
       location: json['location'] is Map
           ? ScheduleLocation.fromJson(Map<String, dynamic>.from(json['location'] as Map))
           : null,
@@ -187,21 +190,27 @@ enum ScheduleEmptyReason {
 
 class ScheduleWeekView {
   const ScheduleWeekView({
-    required this.student,
     required this.week,
     required this.days,
     required this.emptyReason,
+    this.student,
+    this.teacher,
   });
 
-  final ScheduleStudent student;
+  final ScheduleStudent? student;
+  final ScheduleTeacherRef? teacher;
   final ScheduleWeekInfo week;
   final List<ScheduleDay> days;
   final ScheduleEmptyReason emptyReason;
 
   factory ScheduleWeekView.fromJson(Map<String, dynamic> json) {
     final studentJson = json['student'];
+    final teacherJson = json['teacher'];
     final weekJson = json['week'];
-    if (studentJson is! Map || weekJson is! Map) {
+    if (weekJson is! Map) {
+      throw const FormatException('Malformed schedule payload.');
+    }
+    if (studentJson is! Map && teacherJson is! Map) {
       throw const FormatException('Malformed schedule payload.');
     }
     final rawDays = json['days'];
@@ -214,7 +223,12 @@ class ScheduleWeekView {
       }
     }
     return ScheduleWeekView(
-      student: ScheduleStudent.fromJson(Map<String, dynamic>.from(studentJson)),
+      student: studentJson is Map
+          ? ScheduleStudent.fromJson(Map<String, dynamic>.from(studentJson))
+          : null,
+      teacher: teacherJson is Map
+          ? ScheduleTeacherRef.fromJson(Map<String, dynamic>.from(teacherJson))
+          : null,
       week: ScheduleWeekInfo.fromJson(Map<String, dynamic>.from(weekJson)),
       days: days,
       emptyReason: ScheduleEmptyReason.parse(json['empty_reason'] as String?),

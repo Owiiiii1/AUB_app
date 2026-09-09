@@ -4,18 +4,22 @@ import 'package:aub/core/api/api_exception.dart';
 import 'package:aub/features/auth/presentation/auth_messages.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 import 'package:aub/features/schedule/models/schedule_week.dart';
+import 'package:aub/features/schedule/schedule_kind.dart';
 import 'package:aub/features/schedule/state/schedule_state.dart';
 
 class ScheduleController extends ChangeNotifier {
   ScheduleController({
     required ScheduleRepository repository,
+    this.kind = ScheduleKind.student,
     this.studentId,
   }) : _repository = repository;
 
   final ScheduleRepository _repository;
+  final ScheduleKind kind;
   final int? studentId;
   DateTime? _requestedWeek;
   int? lastRequestedStudentId;
+  ScheduleKind? lastRequestedKind;
   ScheduleState _state = const ScheduleState.loading();
 
   ScheduleState get state => _state;
@@ -49,11 +53,16 @@ class ScheduleController extends ChangeNotifier {
 
   Future<void> _fetch(DateTime? week) async {
     lastRequestedStudentId = studentId;
+    lastRequestedKind = kind;
     final previous = _state.view;
     _state = const ScheduleState.loading();
     notifyListeners();
     try {
-      final view = await _repository.load(studentId: studentId, week: week);
+      final view = await _repository.load(
+        kind: kind,
+        studentId: studentId,
+        week: week,
+      );
       final status = view.emptyReason == ScheduleEmptyReason.unpublished
           ? ScheduleStatus.unpublished
           : ScheduleStatus.loaded;

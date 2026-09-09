@@ -7,10 +7,12 @@ class TeacherHomeScreen extends StatelessWidget {
     super.key,
     required this.profile,
     required this.onLogout,
+    this.onOpenSchedule,
   });
 
   final TeacherProfile profile;
   final VoidCallback onLogout;
+  final VoidCallback? onOpenSchedule;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +37,11 @@ class TeacherHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Text(AppStrings.teacherArea),
+            const SizedBox(height: 24),
+            FilledButton(
+              onPressed: onOpenSchedule,
+              child: const Text(AppStrings.schedule),
+            ),
           ],
         ),
       ),

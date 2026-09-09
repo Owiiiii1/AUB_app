@@ -17,6 +17,7 @@ class FakeScheduleApi extends ScheduleApi {
   int? lastStudentId;
   int studentLoads = 0;
   int childLoads = 0;
+  int teacherLoads = 0;
 
   @override
   Future<ScheduleWeekView> studentWeek({DateTime? week}) async {
@@ -37,6 +38,17 @@ class FakeScheduleApi extends ScheduleApi {
     childLoads += 1;
     lastWeek = week;
     lastStudentId = studentId;
+    if (throwError != null) {
+      throw throwError!;
+    }
+    return _viewFor(week);
+  }
+
+  @override
+  Future<ScheduleWeekView> teacherWeek({DateTime? week}) async {
+    teacherLoads += 1;
+    lastWeek = week;
+    lastStudentId = null;
     if (throwError != null) {
       throw throwError!;
     }

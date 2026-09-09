@@ -3,6 +3,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:aub/app/app_strings.dart';
 import 'package:aub/features/schedule/models/schedule_week.dart';
 import 'package:aub/features/schedule/presentation/widgets/schedule_widgets.dart';
+import 'package:aub/features/schedule/schedule_kind.dart';
 import 'package:aub/features/schedule/state/schedule_controller.dart';
 import 'package:aub/features/schedule/state/schedule_state.dart';
 
@@ -36,9 +37,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.childName == null
-        ? AppStrings.schedule
-        : AppStrings.scheduleOf(widget.childName!);
+    final title = switch (widget.controller.kind) {
+      ScheduleKind.teacher => AppStrings.mySchedule,
+      ScheduleKind.child => AppStrings.scheduleOf(widget.childName ?? ''),
+      ScheduleKind.student => AppStrings.schedule,
+    };
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),

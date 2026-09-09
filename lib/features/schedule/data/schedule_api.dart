@@ -18,6 +18,10 @@ class ScheduleApi {
     return _load('/children/$studentId/schedule', week);
   }
 
+  Future<ScheduleWeekView> teacherWeek({DateTime? week}) {
+    return _load('/teacher/schedule', week);
+  }
+
   Future<ScheduleWeekView> _load(String path, DateTime? week) async {
     final data = await _client.get(
       path,

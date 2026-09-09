@@ -110,8 +110,15 @@ class ScheduleLessonTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final cancelled = lesson.status == ScheduleLessonStatus.cancelled;
     final moved = lesson.status == ScheduleLessonStatus.moved;
+    final className = lesson.academyClass?.name;
+    final building = lesson.location?.building?.name;
     final room = lesson.location?.room?.name;
     final teacher = lesson.teacher?.displayName;
+    final locationLine = [
+      if (building != null && building.isNotEmpty) building,
+      if (room != null && room.isNotEmpty) room,
+    ].join(' · ');
+    final showClass = className != null && className.isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -142,9 +149,13 @@ class ScheduleLessonTile extends StatelessWidget {
               color: cancelled ? Theme.of(context).hintColor : null,
             ),
           ),
-          if (room != null && room.isNotEmpty)
+          if (showClass)
+            Text(className, style: Theme.of(context).textTheme.bodySmall),
+          if (showClass && locationLine.isNotEmpty)
+            Text(locationLine, style: Theme.of(context).textTheme.bodySmall)
+          else if (!showClass && room != null && room.isNotEmpty)
             Text(room, style: Theme.of(context).textTheme.bodySmall),
-          if (teacher != null && teacher.isNotEmpty)
+          if (!showClass && teacher != null && teacher.isNotEmpty)
             Text(teacher, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),

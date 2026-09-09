@@ -29,6 +29,7 @@ Release builds refuse a non-HTTPS base URL. TLS certificate validation is not di
 | GET | `/me` | Bearer |
 | GET | `/schedule` | Bearer, student |
 | GET | `/children/{student}/schedule` | Bearer, parent |
+| GET | `/teacher/schedule` | Bearer, teacher |
 | POST | `/auth/logout` | Bearer |
 | POST | `/auth/logout-all` | Implemented in `AuthApi`, not used by UI yet |
 
@@ -84,7 +85,7 @@ Actor type is never inferred from JSON field presence.
 
 ## Schedule
 
-Student: `GET /schedule?week=YYYY-MM-DD`. Parent: `GET /children/{id}/schedule?week=...` for one child at a time.
+Student: `GET /schedule?week=YYYY-MM-DD`. Parent: `GET /children/{id}/schedule?week=...` for one child at a time. Teacher: `GET /teacher/schedule?week=...` (own lessons, `academy_class` on each lesson).
 
 The backend converts any date to Monday–Sunday. Flutter sends a date; it does not invent the week bounds. `week.published` and `empty_reason` distinguish unpublished vs empty vs no class vs network error.
 

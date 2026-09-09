@@ -11,6 +11,7 @@ import 'package:aub/features/home/presentation/student_home_screen.dart';
 import 'package:aub/features/home/presentation/teacher_home_screen.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 import 'package:aub/features/schedule/presentation/schedule_screen.dart';
+import 'package:aub/features/schedule/schedule_kind.dart';
 import 'package:aub/features/schedule/state/schedule_controller.dart';
 
 class AubApp extends StatefulWidget {
@@ -90,6 +91,7 @@ class _AubAppState extends State<AubApp> {
           onLogout: onLogout,
           onOpenChildSchedule: (child) => _openSchedule(
             context,
+            kind: ScheduleKind.child,
             studentId: child.id,
             childName: child.displayName,
           ),
@@ -97,12 +99,14 @@ class _AubAppState extends State<AubApp> {
       TeacherProfile profile => TeacherHomeScreen(
           profile: profile,
           onLogout: onLogout,
+          onOpenSchedule: () => _openSchedule(context, kind: ScheduleKind.teacher),
         ),
     };
   }
 
   void _openSchedule(
     BuildContext context, {
+    ScheduleKind kind = ScheduleKind.student,
     int? studentId,
     String? childName,
   }) {
@@ -111,6 +115,7 @@ class _AubAppState extends State<AubApp> {
         builder: (_) => ScheduleScreen(
           controller: ScheduleController(
             repository: widget.scheduleRepository,
+            kind: kind,
             studentId: studentId,
           ),
           childName: childName,

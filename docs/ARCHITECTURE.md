@@ -1,6 +1,6 @@
 # Architecture
 
-AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student/parent schedule**.
+AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student/parent/teacher schedule**.
 
 ## Layers
 
@@ -77,6 +77,7 @@ lib/
         schedule_screen.dart
         widgets/
           schedule_widgets.dart
+      schedule_kind.dart
 ```
 
 ## Runtime graph
@@ -100,4 +101,4 @@ main()
 `initializing` → splash  
 `unauthenticated` / `authenticating` → login  
 `restoreFailed` → retry (token kept)  
-`authenticated` → actor home → **Orario** (student own class / parent one child at a time)
+`authenticated` → actor home → **Orario** (student own class / parent one child / teacher own lessons)

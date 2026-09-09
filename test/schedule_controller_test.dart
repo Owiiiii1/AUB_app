@@ -2,6 +2,7 @@ import 'package:aub/core/api/api_exception.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 import 'package:aub/features/schedule/models/schedule_week.dart';
 import 'package:aub/features/schedule/state/schedule_controller.dart';
+import 'package:aub/features/schedule/schedule_kind.dart';
 import 'package:aub/features/schedule/state/schedule_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -86,11 +87,58 @@ void main() {
   });
 
   test('parent child id is transmitted', () async {
-    final controller = ScheduleController(repository: repository, studentId: 42);
+    final controller = ScheduleController(
+      repository: repository,
+      kind: ScheduleKind.child,
+      studentId: 42,
+    );
     await controller.loadCurrent();
     expect(api.childLoads, 1);
     expect(api.studentLoads, 0);
     expect(api.lastStudentId, 42);
     expect(controller.lastRequestedStudentId, 42);
+  });
+
+  test('teacher endpoint is called and isolated from student cache', () async {
+    api.responses['current'] = ScheduleWeekView.fromJson(teacherScheduleJson());
+    final teacherController = ScheduleController(
+      repository: repository,
+      kind: ScheduleKind.teacher,
+    );
+    await teacherController.loadCurrent();
+    expect(api.teacherLoads, 1);
+    expect(api.studentLoads, 0);
+    expect(teacherController.lastRequestedKind, ScheduleKind.teacher);
+    expect(teacherController.state.view?.teacher?.displayName, 'Maria Rossi');
+    expect(teacherController.state.view?.days.first.lessons.single.academyClass?.name, 'Classe A');
+
+    final studentController = ScheduleController(repository: repository);
+    api.responses['current'] = ScheduleWeekView.fromJson(publishedScheduleJson());
+    await studentController.loadCurrent();
+    expect(api.studentLoads, 1);
+    expect(api.teacherLoads, 1);
+  });
+
+  test('teacher unpublished week', () async {
+    api.responses['current'] = ScheduleWeekView.fromJson(
+      teacherEmptyScheduleJson(published: false),
+    );
+    final controller = ScheduleController(
+      repository: repository,
+      kind: ScheduleKind.teacher,
+    );
+    await controller.loadCurrent();
+    expect(controller.state.status, ScheduleStatus.unpublished);
+  });
+
+  test('teacher network error', () async {
+    final errorApi = FakeScheduleApi()
+      ..throwError = const ApiException(code: ApiErrorCode.network, message: 'offline');
+    final controller = ScheduleController(
+      repository: ScheduleRepository(api: errorApi),
+      kind: ScheduleKind.teacher,
+    );
+    await controller.loadCurrent();
+    expect(controller.state.status, ScheduleStatus.error);
   });
 }
