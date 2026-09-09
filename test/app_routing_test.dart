@@ -14,6 +14,8 @@ import 'package:aub/app/app_config.dart';
 import 'package:aub/core/api/api_client.dart';
 import 'package:aub/features/auth/data/auth_repository.dart';
 import 'package:aub/features/auth/state/auth_controller.dart';
+import 'package:aub/features/schedule/data/schedule_api.dart';
+import 'package:aub/features/schedule/data/schedule_repository.dart';
 
 void main() {
   testWidgets('initial state shows splash', (tester) async {
@@ -27,7 +29,12 @@ void main() {
     );
     final controller = AuthController(repository: repository);
 
-    await tester.pumpWidget(AubApp(controller: controller));
+    await tester.pumpWidget(
+      AubApp(
+        controller: controller,
+        scheduleRepository: ScheduleRepository(api: ScheduleApi(apiClient)),
+      ),
+    );
 
     expect(find.byType(SplashScreen), findsOneWidget);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -36,7 +43,12 @@ void main() {
 
   testWidgets('unauthenticated shows login', (tester) async {
     final harness = createHarness();
-    await tester.pumpWidget(AubApp(controller: harness.controller));
+    await tester.pumpWidget(
+      AubApp(
+        controller: harness.controller,
+        scheduleRepository: harness.scheduleRepository,
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.byType(LoginScreen), findsOneWidget);
@@ -46,7 +58,12 @@ void main() {
   testWidgets('student session shows student home', (tester) async {
     final harness = createHarness(storedToken: 'token');
     harness.authApi.meJson = studentMeJson(photoUrl: null);
-    await tester.pumpWidget(AubApp(controller: harness.controller));
+    await tester.pumpWidget(
+      AubApp(
+        controller: harness.controller,
+        scheduleRepository: harness.scheduleRepository,
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.byType(StudentHomeScreen), findsOneWidget);
@@ -58,7 +75,12 @@ void main() {
   testWidgets('parent session shows parent home', (tester) async {
     final harness = createHarness(storedToken: 'token');
     harness.authApi.meJson = parentMeJson();
-    await tester.pumpWidget(AubApp(controller: harness.controller));
+    await tester.pumpWidget(
+      AubApp(
+        controller: harness.controller,
+        scheduleRepository: harness.scheduleRepository,
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.byType(ParentHomeScreen), findsOneWidget);
@@ -70,7 +92,12 @@ void main() {
   testWidgets('teacher session shows teacher home', (tester) async {
     final harness = createHarness(storedToken: 'token');
     harness.authApi.meJson = teacherMeJson();
-    await tester.pumpWidget(AubApp(controller: harness.controller));
+    await tester.pumpWidget(
+      AubApp(
+        controller: harness.controller,
+        scheduleRepository: harness.scheduleRepository,
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.byType(TeacherHomeScreen), findsOneWidget);

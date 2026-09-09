@@ -54,8 +54,11 @@ class ApiClient {
     _accessToken = null;
   }
 
-  Future<Map<String, dynamic>> get(String path) {
-    return _send(() => _dio.get<dynamic>(path));
+  Future<Map<String, dynamic>> get(
+    String path, {
+    Map<String, dynamic>? query,
+  }) {
+    return _send(() => _dio.get<dynamic>(path, queryParameters: query));
   }
 
   Future<Map<String, dynamic>> post(

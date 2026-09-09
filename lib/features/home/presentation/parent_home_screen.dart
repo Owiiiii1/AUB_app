@@ -7,10 +7,12 @@ class ParentHomeScreen extends StatelessWidget {
     super.key,
     required this.profile,
     required this.onLogout,
+    this.onOpenChildSchedule,
   });
 
   final ParentProfile profile;
   final VoidCallback onLogout;
+  final ValueChanged<ParentChild>? onOpenChildSchedule;
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +49,10 @@ class ParentHomeScreen extends StatelessWidget {
                 subtitle: Text(
                   '${AppStrings.classLabel}: ${child.academyClass?.name ?? AppStrings.noClass}',
                 ),
+                trailing: const Text(AppStrings.schedule),
+                onTap: onOpenChildSchedule == null
+                    ? null
+                    : () => onOpenChildSchedule!(child),
               ),
             ),
         ],

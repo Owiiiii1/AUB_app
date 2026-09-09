@@ -15,3 +15,5 @@
 - Do not run `flutter upgrade` unless asked.
 - Bundle id stays `com.owlsolutions.aub`.
 - Tests must not contain production credentials.
+- Schedule week cache is in-memory for the session only. Do not persist child or student schedules to disk.
+- Flutter does not invent week bounds. Send `?week=YYYY-MM-DD`; the backend returns Monday–Sunday.

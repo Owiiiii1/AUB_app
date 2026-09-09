@@ -8,10 +8,12 @@ class StudentHomeScreen extends StatelessWidget {
     super.key,
     required this.profile,
     required this.onLogout,
+    this.onOpenSchedule,
   });
 
   final StudentProfile profile;
   final VoidCallback onLogout;
+  final VoidCallback? onOpenSchedule;
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +48,11 @@ class StudentHomeScreen extends StatelessWidget {
           Text('${AppStrings.classLabel}: ${profile.academyClass?.name ?? AppStrings.noClass}'),
           const SizedBox(height: 8),
           Text('${AppStrings.yearLabel}: ${profile.academicYear?.name ?? '—'}'),
+          const SizedBox(height: 24),
+          FilledButton(
+            onPressed: onOpenSchedule,
+            child: const Text(AppStrings.schedule),
+          ),
         ],
       ),
     );

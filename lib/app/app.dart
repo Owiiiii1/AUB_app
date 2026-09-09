@@ -9,15 +9,20 @@ import 'package:aub/features/auth/state/auth_state.dart';
 import 'package:aub/features/home/presentation/parent_home_screen.dart';
 import 'package:aub/features/home/presentation/student_home_screen.dart';
 import 'package:aub/features/home/presentation/teacher_home_screen.dart';
+import 'package:aub/features/schedule/data/schedule_repository.dart';
+import 'package:aub/features/schedule/presentation/schedule_screen.dart';
+import 'package:aub/features/schedule/state/schedule_controller.dart';
 
 class AubApp extends StatefulWidget {
   const AubApp({
     super.key,
     required this.controller,
+    required this.scheduleRepository,
     this.restoreOnStart = true,
   });
 
   final AuthController controller;
+  final ScheduleRepository scheduleRepository;
   final bool restoreOnStart;
 
   @override
@@ -61,14 +66,14 @@ class _AubAppState extends State<AubApp> {
                 message: state.errorMessage ?? AppStrings.restoreOffline,
                 onRetry: widget.controller.restoreSession,
               ),
-            AuthStatus.authenticated => _authenticatedHome(state),
+            AuthStatus.authenticated => _authenticatedHome(context, state),
           };
         },
       ),
     );
   }
 
-  Widget _authenticatedHome(AuthState state) {
+  Widget _authenticatedHome(BuildContext context, AuthState state) {
     final session = state.session;
     if (session == null) {
       return LoginScreen(controller: widget.controller);
@@ -78,15 +83,39 @@ class _AubAppState extends State<AubApp> {
       StudentProfile profile => StudentHomeScreen(
           profile: profile,
           onLogout: onLogout,
+          onOpenSchedule: () => _openSchedule(context),
         ),
       ParentProfile profile => ParentHomeScreen(
           profile: profile,
           onLogout: onLogout,
+          onOpenChildSchedule: (child) => _openSchedule(
+            context,
+            studentId: child.id,
+            childName: child.displayName,
+          ),
         ),
       TeacherProfile profile => TeacherHomeScreen(
           profile: profile,
           onLogout: onLogout,
         ),
     };
+  }
+
+  void _openSchedule(
+    BuildContext context, {
+    int? studentId,
+    String? childName,
+  }) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ScheduleScreen(
+          controller: ScheduleController(
+            repository: widget.scheduleRepository,
+            studentId: studentId,
+          ),
+          childName: childName,
+        ),
+      ),
+    );
   }
 }

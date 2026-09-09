@@ -23,4 +23,15 @@ class AppStrings {
   static const noClass = 'Classe non assegnata';
   static const restoreOffline =
       'Connessione non disponibile. La sessione è ancora salvata.';
+  static const schedule = 'Orario';
+  static const thisWeek = 'Questa settimana';
+  static const noLesson = 'Nessuna lezione';
+  static const cancelled = 'Annullata';
+  static const moved = 'Spostata';
+  static const unpublishedWeek =
+      'L\'orario di questa settimana non è ancora pubblicato.';
+  static const noClassSchedule =
+      'Nessuna classe assegnata. L\'orario non è disponibile.';
+  static const noLessonsThisWeek = 'Nessuna lezione in questa settimana.';
+  static String scheduleOf(String name) => 'Orario di $name';
 }

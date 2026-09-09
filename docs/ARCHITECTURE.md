@@ -1,6 +1,6 @@
 # Architecture
 
-AUB_app is the Flutter client for Accademia Umbra di Belle Arti. This stage is an **authentication foundation** only: restore a session, log in, route by actor, log out. Home screens are placeholders that display `/me`.
+AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student/parent schedule**.
 
 ## Layers
 
@@ -13,9 +13,10 @@ AUB_app is the Flutter client for Accademia Umbra di Belle Arti. This stage is a
 | `lib/features/auth/models` | Typed `/me` and login models |
 | `lib/features/auth/state` | `AuthController` / `AuthState` |
 | `lib/features/auth/presentation` | Splash, login, offline-restore |
-| `lib/features/home/presentation` | Actor home placeholders |
+| `lib/features/home/presentation` | Actor home placeholders + Orario entry |
+| `lib/features/schedule` | API, repository, week state, schedule screen |
 
-UI never calls HTTP. UI never reads the token. Presentation talks to `AuthController` only.
+UI never calls HTTP. UI never reads the token. Presentation talks to `AuthController` / `ScheduleController`.
 
 There is no Riverpod, Bloc, GetX, or Provider. `AuthController` is a `ChangeNotifier`.
 
@@ -39,6 +40,8 @@ lib/
       device_name.dart
     media/
       safe_https_url.dart
+    time/
+      date_only.dart
   features/
     auth/
       data/
@@ -61,6 +64,19 @@ lib/
         student_home_screen.dart
         parent_home_screen.dart
         teacher_home_screen.dart
+    schedule/
+      data/
+        schedule_api.dart
+        schedule_repository.dart
+      models/
+        schedule_week.dart
+      state/
+        schedule_controller.dart
+        schedule_state.dart
+      presentation/
+        schedule_screen.dart
+        widgets/
+          schedule_widgets.dart
 ```
 
 ## Runtime graph
@@ -72,6 +88,7 @@ main()
   SecureTokenStorage
   AuthRepository
   AuthController
+  ScheduleRepository (in-memory week cache)
   apiClient.onUnauthorized → controller.handleUnauthorized
   AubApp
 ```
@@ -83,4 +100,4 @@ main()
 `initializing` → splash  
 `unauthenticated` / `authenticating` → login  
 `restoreFailed` → retry (token kept)  
-`authenticated` → actor home
+`authenticated` → actor home → **Orario** (student own class / parent one child at a time)
