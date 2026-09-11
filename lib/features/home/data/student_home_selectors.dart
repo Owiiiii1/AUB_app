@@ -1,5 +1,5 @@
+import 'package:aub/core/time/clock.dart';
 import 'package:aub/core/time/date_only.dart';
-import 'package:aub/core/time/lesson_time.dart';
 import 'package:aub/features/schedule/models/schedule_week.dart';
 
 class UpcomingLesson {
@@ -26,8 +26,9 @@ UpcomingLesson? findNextLesson(ScheduleWeekView? view, DateTime now) {
           lesson.status != ScheduleLessonStatus.moved) {
         continue;
       }
-      final start = combineDateAndClock(day.date, lesson.startsAt);
-      if (start == null || !start.isAfter(now)) {
+      final start = academyLessonStart(day.date, lesson.startsAt);
+      final academyNow = toAcademyTime(now);
+      if (start == null || !start.isAfter(academyNow)) {
         continue;
       }
       if (bestStart == null || start.isBefore(bestStart)) {
@@ -46,7 +47,8 @@ List<({ScheduleDay day, ScheduleLesson lesson})> todaysLessons(
   if (view == null || view.emptyReason == ScheduleEmptyReason.unpublished) {
     return const [];
   }
-  final today = DateTime(now.year, now.month, now.day);
+  final academyNow = toAcademyTime(now);
+  final today = DateTime(academyNow.year, academyNow.month, academyNow.day);
   for (final day in view.days) {
     if (isSameDate(day.date, today)) {
       return [

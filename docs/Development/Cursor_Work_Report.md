@@ -2,31 +2,24 @@
 
 ## Task
 
-Production Stage 1 — Student mobile application UI in `Owiiiii1/AUB_app`. Visual source of truth: `AUB_admin/docs/ref/student/{home,orario,presenze,profile}` (`screen.png`, `DESIGN.md`, `code.html`). Functional source of truth: existing Flutter architecture and API contracts. No new backend.
+Fix Student Home academy time before closing Student Production Stage 1. `AcademyClock` must not use device `DateTime.now()` timezone for Oggi, Prossima lezione, or the day boundary. Source of truth is IANA `Europe/Rome` (CET/CEST).
 
-## References inspected
+## What changed
 
-All four Student folders. Tokens taken from DESIGN/code.html: ivory `#FCF9F8`, navy `#0B192C`, burgundy `#8B2635`, gold `#C5A059`, Oswald + Work Sans, 16px margins, 14–16px card radii, 64px bottom nav. Stitch HTML was not copied. Remote Stitch photos/logo URLs are not used.
+- Added `timezone` and IANA `Europe/Rome`.
+- `AcademyClock.now()` returns academy-local `TZDateTime` in `Europe/Rome`, independent of the phone timezone.
+- Still injectable: `AcademyClock(now: () => …)`. UTC instants convert from the true instant; naive test `DateTime`s keep wall-clock components as Rome so existing tests are not device-TZ dependent.
+- Student Home selectors (`todaysLessons`, `findNextLesson`) and the next-lesson countdown compare academy-local instants via `academyLessonStart` / `toAcademyTime`.
+- `main()` initializes timezone data. Schedule backend week bounds are unchanged.
 
-## Student screens
+No hardcoded UTC+1 / UTC+2 and no manual DST table.
 
-- **Shell:** Home / Orario / Presenze / Profilo bottom navigation, shared repositories, SafeArea, selected gold indicator.
-- **Home:** real `Ciao, {firstName}` from `/me`; next published/moved lesson on the current week (cancelled excluded); today's lessons including cancelled; month summary without percentages.
-- **Orario / Presenze:** existing controllers; Student visual chrome; Parent/Teacher screens not redesigned.
-- **Profilo:** display name, class, year, email; logout confirmation. Hidden: notifications, password, 2FA, devices, language, photo edit, classroom directions, artistic announcements.
+## Tests
 
-## Design system
+- Instant when another TZ is still the previous calendar day and Rome is already the next day → Home uses Rome day.
+- DST: summer CEST (UTC+2) and winter CET (UTC+1).
+- Existing Student Home tests remain green.
 
-Reusable tokens in `lib/app/theme` and widgets in `lib/shared/widgets` (card, avatar initials, badges, empty/error/loading, header, bottom nav). `ThemeData` rebuilt from Stitch. Fonts bundled as assets.
+## Commands
 
-## Home data
-
-`StudentHomeController` uses `ScheduleRepository` + `AttendanceHistoryRepository`. Next lesson: current week, `Europe/Rome` approximated via injectable `AcademyClock` / device local time, nearest future published/moved lesson. Unmarked lessons are not absences.
-
-## Tests / quality
-
-New selector, controller, and Student UI tests (navigation, home data/empty, schedule statuses, attendance statuses, profile logout). Full suite **83 passed**. `flutter analyze` / `flutter test` / `flutter build apk --debug`.
-
-## Open visual/manual notes
-
-Pixel-perfect Stitch details (decorative blobs, fake VIP corso chips, frequency %, filter sheet) were intentionally omitted. PM will give targeted visual corrections after a device pass. Real academy schedule is still mostly empty; empty states are the production look until teachers publish weeks.
+`flutter pub get`, `flutter analyze`, `flutter test` (**86 passed**), `flutter build apk --debug`.

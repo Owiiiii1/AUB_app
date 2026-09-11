@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:aub/core/time/clock.dart';
 import 'package:aub/app/app.dart';
 import 'package:aub/app/app_config.dart';
 import 'package:aub/core/api/api_client.dart';
@@ -14,6 +15,7 @@ import 'package:aub/features/schedule/data/schedule_repository.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  ensureAcademyTimeZones();
 
   final config = AppConfig.fromEnvironment();
   if (kReleaseMode && !config.usesHttps) {

@@ -3,6 +3,7 @@ import 'package:aub/app/app_strings.dart';
 import 'package:aub/app/theme/aub_colors.dart';
 import 'package:aub/app/theme/aub_spacing.dart';
 import 'package:aub/app/theme/aub_typography.dart';
+import 'package:aub/core/time/clock.dart';
 import 'package:aub/core/time/date_only.dart';
 import 'package:aub/core/time/lesson_time.dart';
 import 'package:aub/features/attendance/models/attendance_models.dart';
@@ -262,8 +263,8 @@ class _NextLessonCard extends StatelessWidget {
     }
 
     final lesson = upcoming.lesson;
-    final now = state.now ?? DateTime.now();
-    final start = combineDateAndClock(upcoming.day.date, lesson.startsAt);
+    final now = state.now ?? AcademyClock().now();
+    final start = academyLessonStart(upcoming.day.date, lesson.startsAt);
     final minutes = start?.difference(now).inMinutes;
     final timing = start != null && isSameDate(upcoming.day.date, now)
         ? (minutes != null && minutes > 0
