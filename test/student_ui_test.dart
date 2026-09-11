@@ -8,6 +8,8 @@ import 'package:aub/features/auth/models/auth_session.dart';
 import 'package:aub/features/home/presentation/student_home_screen.dart';
 import 'package:aub/features/home/presentation/student_shell.dart';
 import 'package:aub/features/home/state/student_home_controller.dart';
+import 'package:aub/app/app_config.dart';
+import 'package:aub/core/api/api_client.dart';
 import 'package:aub/features/profile/presentation/student_profile_screen.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 import 'package:aub/features/schedule/models/schedule_week.dart';
@@ -21,6 +23,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'helpers/attendance_fixtures.dart';
 import 'helpers/auth_fixtures.dart';
 import 'helpers/fake_attendance_api.dart';
+import 'helpers/fake_profile_api.dart';
 import 'helpers/fake_schedule_api.dart';
 import 'helpers/schedule_fixtures.dart';
 
@@ -39,8 +42,13 @@ Widget _shell({
       user: me.user,
       onLogout: onLogout ?? () {},
       scheduleRepository: ScheduleRepository(api: scheduleApi),
-      attendanceHistoryRepository: AttendanceHistoryRepository(api: attendanceApi),
+      attendanceHistoryRepository: AttendanceHistoryRepository(
+        api: attendanceApi,
+      ),
       homeController: homeController,
+      profileApi: FakeProfileApi(
+        ApiClient(config: AppConfig(apiBaseUrl: testApiBaseUrl)),
+      ),
     ),
   );
 }
@@ -263,6 +271,9 @@ void main() {
             profile: me.profile as StudentProfile,
             user: me.user,
             onLogout: () => loggedOut = true,
+            profileApi: FakeProfileApi(
+              ApiClient(config: AppConfig(apiBaseUrl: testApiBaseUrl)),
+            ),
           ),
         ),
       ),
@@ -270,6 +281,33 @@ void main() {
 
     expect(find.text('Mario Rossi'), findsOneWidget);
     expect(find.text('mario@example.test'), findsOneWidget);
+    expect(find.text('+39 333 120 8801'), findsOneWidget);
+    expect(find.text('18 aprile 2009'), findsOneWidget);
+    expect(find.text('Via Padova 128\n20127 Milano (MI)'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(AppStrings.changePassword),
+      200,
+    );
+    expect(find.text(AppStrings.changePassword), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(AppStrings.devices),
+      200,
+    );
+    expect(find.text(AppStrings.devices), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(AppStrings.language),
+      200,
+    );
+    expect(find.text(AppStrings.language), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(AppStrings.pushNotifications),
+      200,
+    );
+    expect(find.text(AppStrings.pushNotifications), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(AppStrings.logoutAccount),
+      200,
+    );
     expect(find.text(AppStrings.logoutAccount), findsOneWidget);
     await tester.tap(find.text(AppStrings.logoutAccount));
     await tester.pumpAndSettle();

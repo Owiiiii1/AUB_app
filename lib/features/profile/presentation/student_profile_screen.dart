@@ -1,29 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:aub/app/app_strings.dart';
 import 'package:aub/app/theme/aub_colors.dart';
 import 'package:aub/app/theme/aub_spacing.dart';
 import 'package:aub/app/theme/aub_typography.dart';
 import 'package:aub/features/auth/models/actor_profile.dart';
 import 'package:aub/features/auth/models/api_user.dart';
+import 'package:aub/features/profile/data/profile_api.dart';
+import 'package:aub/features/profile/data/profile_preferences.dart';
+import 'package:aub/features/profile/presentation/change_password_screen.dart';
+import 'package:aub/features/profile/presentation/devices_screen.dart';
+import 'package:aub/features/profile/presentation/language_screen.dart';
+import 'package:aub/features/profile/presentation/notifications_screen.dart';
+import 'package:aub/features/profile/presentation/profile_menu_row.dart';
 import 'package:aub/shared/widgets/aub_avatar.dart';
 import 'package:aub/shared/widgets/aub_card.dart';
 
-class StudentProfileScreen extends StatelessWidget {
+class StudentProfileScreen extends StatefulWidget {
   const StudentProfileScreen({
     super.key,
     required this.profile,
     required this.user,
     required this.onLogout,
+    this.profileApi,
+    this.preferences,
   });
 
   final StudentProfile profile;
   final ApiUser user;
   final VoidCallback onLogout;
+  final ProfileApi? profileApi;
+  final ProfilePreferences? preferences;
+
+  @override
+  State<StudentProfileScreen> createState() => _StudentProfileScreenState();
+}
+
+class _StudentProfileScreenState extends State<StudentProfileScreen> {
+  late final ProfilePreferences _preferences;
+
+  @override
+  void initState() {
+    super.initState();
+    _preferences = widget.preferences ?? ProfilePreferences();
+    _preferences.load().then((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final className = profile.academyClass?.name;
-    final yearName = profile.academicYear?.name;
+    final className = widget.profile.academyClass?.name;
+    final yearName = widget.profile.academicYear?.name;
+    final api = widget.profileApi;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(
@@ -46,92 +77,141 @@ class StudentProfileScreen extends StatelessWidget {
             AubSpacing.lg,
             AubSpacing.md,
           ),
-          child: Column(
-            children: [
-              AubAvatar(
-                size: 96,
-                photoUrl: profile.photoUrl,
-                name: profile.displayName,
-              ),
-              const SizedBox(height: AubSpacing.sm),
-              Text(profile.displayName, style: AubText.headlineMd),
-              if (className != null && className.isNotEmpty) ...[
-                const SizedBox(height: AubSpacing.xs),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AubSpacing.sm,
-                    vertical: 4,
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: AubAvatar(
+                    size: 96,
+                    photoUrl: widget.profile.photoUrl,
+                    name: widget.profile.displayName,
                   ),
-                  decoration: BoxDecoration(
-                    color: AubColors.burgundyLight,
-                    borderRadius: BorderRadius.circular(AubRadii.pill),
+                ),
+                const SizedBox(height: AubSpacing.sm),
+                Text(
+                  widget.profile.displayName,
+                  style: AubText.headlineMd,
+                  textAlign: TextAlign.center,
+                ),
+                if (className != null && className.isNotEmpty) ...[
+                  const SizedBox(height: AubSpacing.xs),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AubSpacing.sm,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AubColors.burgundyLight,
+                      borderRadius: BorderRadius.circular(AubRadii.pill),
+                    ),
+                    child: Text(
+                      className.toUpperCase(),
+                      style: AubText.labelCaps.copyWith(
+                        color: AubColors.burgundy,
+                      ),
+                    ),
                   ),
-                  child: Text(
-                    className.toUpperCase(),
-                    style: AubText.labelCaps.copyWith(color: AubColors.burgundy),
+                ],
+                const SizedBox(height: AubSpacing.sm),
+                if (yearName != null && yearName.isNotEmpty)
+                  Text(
+                    '${AppStrings.yearLabel}: $yearName',
+                    style: AubText.labelSm,
+                    textAlign: TextAlign.center,
                   ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.user.email,
+                  style: AubText.bodySm,
+                  textAlign: TextAlign.center,
                 ),
               ],
-              const SizedBox(height: AubSpacing.sm),
-              if (yearName != null && yearName.isNotEmpty)
-                Text(
-                  '${AppStrings.yearLabel}: $yearName',
-                  style: AubText.labelSm,
-                ),
-              const SizedBox(height: 4),
-              Text(
-                user.email,
-                style: AubText.bodySm,
-                textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        const SizedBox(height: AubSpacing.lg),
+        Text(AppStrings.personalData.toUpperCase(), style: AubText.labelCaps),
+        const SizedBox(height: AubSpacing.xs),
+        AubCard(
+          child: Column(
+            children: [
+              _dataRow(AppStrings.phoneLabel, _orDash(widget.profile.phone)),
+              const Divider(height: 24, color: AubColors.borderHairline),
+              _dataRow(
+                AppStrings.birthDateLabel,
+                _formatBirth(widget.profile.birthDate),
+              ),
+              const Divider(height: 24, color: AubColors.borderHairline),
+              _dataRow(
+                AppStrings.addressLabel,
+                widget.profile.formattedAddress ?? AppStrings.valueUnavailable,
               ),
             ],
           ),
         ),
         const SizedBox(height: AubSpacing.lg),
+        Text(AppStrings.securityAccess.toUpperCase(), style: AubText.labelCaps),
+        const SizedBox(height: AubSpacing.xs),
         AubCard(
           padding: EdgeInsets.zero,
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-            onTap: () => _confirmLogout(context),
-            child: Padding(
-              padding: const EdgeInsets.all(AubSpacing.md),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: AubColors.alertBg,
-                      borderRadius: BorderRadius.circular(AubRadii.lg),
-                    ),
-                    child: const Icon(
-                      Icons.logout,
-                      color: AubColors.alert,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: AubSpacing.sm),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppStrings.logoutAccount,
-                          style: AubText.bodyMd.copyWith(
-                            color: AubColors.alert,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(AppStrings.logoutHint, style: AubText.labelSm),
-                      ],
-                    ),
-                  ),
-                  const Icon(Icons.arrow_forward, color: AubColors.alert, size: 20),
-                ],
+          child: Column(
+            children: [
+              if (api != null)
+                ProfileMenuRow(
+                  icon: Icons.lock_outline,
+                  title: AppStrings.changePassword,
+                  subtitle: AppStrings.changePasswordHint,
+                  onTap: () => _openPassword(api),
+                ),
+              if (api != null)
+                const Divider(height: 1, color: AubColors.borderHairline),
+              if (api != null)
+                ProfileMenuRow(
+                  icon: Icons.devices,
+                  title: AppStrings.devices,
+                  subtitle: AppStrings.devicesHint,
+                  onTap: () => _openDevices(api),
+                ),
+              if (api != null)
+                const Divider(height: 1, color: AubColors.borderHairline),
+              ProfileMenuRow(
+                icon: Icons.logout,
+                iconColor: AubColors.alert,
+                iconBackground: AubColors.alertBg,
+                titleColor: AubColors.alert,
+                title: AppStrings.logoutAccount,
+                subtitle: AppStrings.logoutHint,
+                onTap: () => _confirmLogout(context),
               ),
-            ),
-            ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AubSpacing.lg),
+        Text(
+          AppStrings.preferencesLanguage.toUpperCase(),
+          style: AubText.labelCaps,
+        ),
+        const SizedBox(height: AubSpacing.xs),
+        AubCard(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              ProfileMenuRow(
+                icon: Icons.language,
+                title: AppStrings.language,
+                subtitle: _languageLabel(_preferences.language),
+                onTap: _openLanguage,
+              ),
+              const Divider(height: 1, color: AubColors.borderHairline),
+              ProfileMenuRow(
+                icon: Icons.notifications_outlined,
+                title: AppStrings.pushNotifications,
+                subtitle: AppStrings.pushHint,
+                onTap: _openNotifications,
+              ),
+            ],
           ),
         ),
         const SizedBox(height: AubSpacing.lg),
@@ -142,6 +222,91 @@ class StudentProfileScreen extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Widget _dataRow(String label, String value) {
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label.toUpperCase(), style: AubText.labelCaps),
+          const SizedBox(height: 4),
+          Text(value, style: AubText.bodyMd),
+        ],
+      ),
+    );
+  }
+
+  String _orDash(String? value) {
+    final trimmed = value?.trim();
+    if (trimmed == null || trimmed.isEmpty) {
+      return AppStrings.valueUnavailable;
+    }
+    return trimmed;
+  }
+
+  String _formatBirth(String? raw) {
+    if (raw == null || raw.isEmpty) {
+      return AppStrings.valueUnavailable;
+    }
+    final parsed = DateTime.tryParse(raw);
+    if (parsed == null) {
+      return raw;
+    }
+    return DateFormat('d MMMM yyyy', 'it').format(parsed);
+  }
+
+  String _languageLabel(String code) {
+    return switch (code) {
+      'en' => AppStrings.languageEnglish,
+      'ru' => AppStrings.languageRussian,
+      _ => AppStrings.languageItalian,
+    };
+  }
+
+  Future<void> _openPassword(ProfileApi api) async {
+    final changed = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => ChangePasswordScreen(api: api),
+      ),
+    );
+    if (changed == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.passwordChanged)),
+      );
+    }
+  }
+
+  Future<void> _openDevices(ProfileApi api) async {
+    final loggedOutAll = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => DevicesScreen(api: api)),
+    );
+    if (loggedOutAll == true) {
+      widget.onLogout();
+    }
+  }
+
+  Future<void> _openLanguage() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => LanguageScreen(preferences: _preferences),
+      ),
+    );
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _openNotifications() async {
+    await Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => NotificationsScreen(preferences: _preferences),
+      ),
+    );
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _confirmLogout(BuildContext context) async {
@@ -191,7 +356,7 @@ class StudentProfileScreen extends StatelessWidget {
       },
     );
     if (confirmed == true) {
-      onLogout();
+      widget.onLogout();
     }
   }
 }

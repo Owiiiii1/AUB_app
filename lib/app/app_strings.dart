@@ -93,4 +93,43 @@ class AppStrings {
     }
     return '$count lezioni';
   }
+
+  static const personalData = 'Dati personali';
+  static const phoneLabel = 'Telefono';
+  static const birthDateLabel = 'Data di nascita';
+  static const addressLabel = 'Indirizzo';
+  static const valueUnavailable = '—';
+  static const securityAccess = 'Sicurezza e accesso';
+  static const changePassword = 'Cambio password';
+  static const changePasswordHint = 'Aggiorna la password di accesso';
+  static const currentPasswordLabel = 'Password attuale';
+  static const newPasswordLabel = 'Nuova password';
+  static const confirmPasswordLabel = 'Conferma nuova password';
+  static const savePassword = 'Salva password';
+  static const passwordChanged = 'Password aggiornata.';
+  static const currentPasswordWrong = 'La password attuale non è corretta.';
+  static const passwordTooShort = 'La nuova password deve avere almeno 8 caratteri.';
+  static const passwordMismatch = 'Le password non coincidono.';
+  static const devices = 'Dispositivi';
+  static const devicesHint = 'Sessioni attive su questo account';
+  static const thisDevice = 'Questo dispositivo';
+  static const revokeDevice = 'Revoca';
+  static const revokeDeviceTitle = 'Revocare questo dispositivo?';
+  static const revokeDeviceBody =
+      'Dovrai accedere di nuovo su quel dispositivo.';
+  static const logoutAllDevices = 'Esci da tutti i dispositivi';
+  static const noOtherDevices = 'Nessun altro dispositivo connesso.';
+  static const lastUsed = 'Ultimo utilizzo';
+  static const preferencesLanguage = 'Preferenze e lingua';
+  static const language = 'Lingua';
+  static const languageHint = 'Lingua dell\'applicazione';
+  static const languageItalian = 'Italiano';
+  static const languageEnglish = 'English';
+  static const languageRussian = 'Русский';
+  static const languageLimited =
+      'L\'app è attualmente disponibile in italiano.';
+  static const pushNotifications = 'Notifiche push';
+  static const pushHint = 'Avvisi su lezioni e presenze';
+  static const pushUnavailable =
+      'Le notifiche push saranno attive quando il servizio sarà disponibile.';
 }

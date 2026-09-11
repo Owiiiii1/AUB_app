@@ -27,6 +27,9 @@ Release builds refuse a non-HTTPS base URL. TLS certificate validation is not di
 | GET | `/health` | No (smoke only) |
 | POST | `/auth/login` | No (`skipAuth`) |
 | GET | `/me` | Bearer |
+| PUT | `/me/password` | Bearer |
+| GET | `/me/devices` | Bearer |
+| DELETE | `/me/devices/{id}` | Bearer |
 | GET | `/schedule` | Bearer, student |
 | GET | `/children/{student}/schedule` | Bearer, parent |
 | GET | `/teacher/schedule` | Bearer, teacher |
@@ -35,7 +38,7 @@ Release builds refuse a non-HTTPS base URL. TLS certificate validation is not di
 | GET | `/attendance` | Bearer, student |
 | GET | `/children/{student}/attendance` | Bearer, parent |
 | POST | `/auth/logout` | Bearer |
-| POST | `/auth/logout-all` | Implemented in `AuthApi`, not used by UI yet |
+| POST | `/auth/logout-all` | Bearer |
 
 Login body:
 

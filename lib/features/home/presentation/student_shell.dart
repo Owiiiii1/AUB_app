@@ -9,6 +9,8 @@ import 'package:aub/features/auth/models/actor_profile.dart';
 import 'package:aub/features/auth/models/api_user.dart';
 import 'package:aub/features/home/presentation/student_home_screen.dart';
 import 'package:aub/features/home/state/student_home_controller.dart';
+import 'package:aub/features/profile/data/profile_api.dart';
+import 'package:aub/features/profile/data/profile_preferences.dart';
 import 'package:aub/features/profile/presentation/student_profile_screen.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 import 'package:aub/features/schedule/presentation/schedule_screen.dart';
@@ -26,6 +28,8 @@ class StudentShell extends StatefulWidget {
     this.homeController,
     this.scheduleController,
     this.attendanceHistoryController,
+    this.profileApi,
+    this.preferences,
   });
 
   final StudentProfile profile;
@@ -36,6 +40,8 @@ class StudentShell extends StatefulWidget {
   final StudentHomeController? homeController;
   final ScheduleController? scheduleController;
   final AttendanceHistoryController? attendanceHistoryController;
+  final ProfileApi? profileApi;
+  final ProfilePreferences? preferences;
 
   @override
   State<StudentShell> createState() => _StudentShellState();
@@ -136,6 +142,8 @@ class _StudentShellState extends State<StudentShell> {
                   profile: widget.profile,
                   user: widget.user,
                   onLogout: widget.onLogout,
+                  profileApi: widget.profileApi,
+                  preferences: widget.preferences,
                 ),
               ],
             ),

@@ -15,6 +15,8 @@ class SecureTokenStorage implements TokenStorage {
 
   final FlutterSecureStorage _storage;
 
+  FlutterSecureStorage get storage => _storage;
+
   @override
   Future<String?> readToken() {
     return _storage.read(key: tokenKey);

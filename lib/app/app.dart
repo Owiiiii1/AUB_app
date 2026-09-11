@@ -16,6 +16,8 @@ import 'package:aub/features/auth/state/auth_state.dart';
 import 'package:aub/features/home/presentation/parent_home_screen.dart';
 import 'package:aub/features/home/presentation/student_shell.dart';
 import 'package:aub/features/home/presentation/teacher_home_screen.dart';
+import 'package:aub/features/profile/data/profile_api.dart';
+import 'package:aub/features/profile/data/profile_preferences.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 import 'package:aub/features/schedule/models/schedule_week.dart';
 import 'package:aub/features/schedule/presentation/schedule_screen.dart';
@@ -29,6 +31,8 @@ class AubApp extends StatefulWidget {
     required this.scheduleRepository,
     required this.attendanceRepository,
     required this.attendanceHistoryRepository,
+    this.profileApi,
+    this.profilePreferences,
     this.restoreOnStart = true,
   });
 
@@ -36,6 +40,8 @@ class AubApp extends StatefulWidget {
   final ScheduleRepository scheduleRepository;
   final AttendanceRepository attendanceRepository;
   final AttendanceHistoryRepository attendanceHistoryRepository;
+  final ProfileApi? profileApi;
+  final ProfilePreferences? profilePreferences;
   final bool restoreOnStart;
 
   @override
@@ -88,6 +94,8 @@ class _AubAppState extends State<AubApp> {
           onLogout: onLogout,
           scheduleRepository: widget.scheduleRepository,
           attendanceHistoryRepository: widget.attendanceHistoryRepository,
+          profileApi: widget.profileApi,
+          preferences: widget.profilePreferences,
         ),
       ParentProfile profile => ParentHomeScreen(
           profile: profile,

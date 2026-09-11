@@ -9,17 +9,17 @@ Authentication plus **Student production UI** (Stitch-aligned shell), parent/tea
 - Student Home dashboard from existing APIs: greeting from `/me`, next lesson and today's lessons from current week schedule, month attendance summary (absolute counts only)
 - Empty Home/Presenze copy: `Nessuna lezione programmata`, `Nessuna lezione in programma oggi.`, `Nessuna presenza registrata questo mese.` (`no AttendanceRecord` ≠ absent)
 - Student Orario / Presenze restyled; week/month navigation, statuses, retry, 401 global handling unchanged
-- Student Profilo: real `/me` identity + working logout (no fake settings)
+- Student Profilo: identity (centered) + read-only phone / birth date / address + password change + devices + language preference + local push toggle + logout
 - Parent Home → per child **Orario** + **Presenze di {name}** (not redesigned)
 - Teacher Home → **Orario** → marking **Presenze**
 - Fonts: bundled Oswald + Work Sans from the Stitch palette
 
 ## What is intentionally not built
 
-Parent/Teacher visual production stages, percentages, streaks, absence warnings, justification, check-in, push, calendar sync, profile editing, documents, communications, payments, timetable editing, persistent offline cache, certificate pinning.
+Parent/Teacher visual production stages, percentages, streaks, absence warnings, justification, check-in, push delivery (FCM), calendar sync, profile editing, documents, communications, payments, timetable editing, persistent offline cache, certificate pinning.
 
 ## Backend
 
 Production API: `https://aub.owlsolutions.net/api/v1`
 
-Student Home reuses `GET /me`, `GET /schedule`, `GET /attendance`. No new backend endpoints.
+Student Home reuses `GET /me`, `GET /schedule`, `GET /attendance`. Profile uses `GET /me`, `PUT /me/password`, `GET /me/devices`, `DELETE /me/devices/{id}`, `POST /auth/logout-all`. Language and push toggles are local only.

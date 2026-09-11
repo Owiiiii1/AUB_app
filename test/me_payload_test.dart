@@ -15,6 +15,9 @@ void main() {
     expect(profile.academyClass?.name, 'Prima A');
     expect(profile.academicYear?.name, '2026/2027');
     expect(profile.photoUrl, 'https://aub.owlsolutions.net/storage/students/1.jpg');
+    expect(profile.phone, '+39 333 120 8801');
+    expect(profile.birthDate, '2009-04-18');
+    expect(profile.formattedAddress, 'Via Padova 128\n20127 Milano (MI)');
   });
 
   test('parses parent /me payload with children', () {

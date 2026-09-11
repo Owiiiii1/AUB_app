@@ -4,4 +4,4 @@
 2. Later production stages: **Parent mobile UI** (`docs/ref/parent`) then **Teacher mobile UI** (`docs/ref/teacher`).
 3. Later product slice: **Teacher Daily Check-in**.
 
-Still out of scope until explicitly requested: registration, password reset, biometrics, refresh tokens, push, certificate pinning, Flutter Web, unified family calendar, teacher timetable editing, attendance percentages, profile editing backend.
+Still out of scope until explicitly requested: registration, forgot/reset password, biometrics, refresh tokens, push delivery (FCM), certificate pinning, Flutter Web, unified family calendar, teacher timetable editing, attendance percentages, profile editing backend.

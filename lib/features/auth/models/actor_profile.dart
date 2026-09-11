@@ -25,6 +25,11 @@ class StudentProfile extends ActorProfile {
     required this.lastName,
     required this.displayName,
     this.photoUrl,
+    this.phone,
+    this.birthDate,
+    this.residenceAddress,
+    this.residenceCityProvince,
+    this.residencePostalCode,
     this.academyClass,
     this.academicYear,
   });
@@ -35,8 +40,29 @@ class StudentProfile extends ActorProfile {
   @override
   final String displayName;
   final String? photoUrl;
+  final String? phone;
+  final String? birthDate;
+  final String? residenceAddress;
+  final String? residenceCityProvince;
+  final String? residencePostalCode;
   final NamedRef? academyClass;
   final NamedRef? academicYear;
+
+  String? get formattedAddress {
+    final line1 = residenceAddress?.trim();
+    final cityBits = [
+      residencePostalCode?.trim(),
+      residenceCityProvince?.trim(),
+    ].whereType<String>().where((part) => part.isNotEmpty).join(' ');
+    final lines = [
+      if (line1 != null && line1.isNotEmpty) line1,
+      if (cityBits.isNotEmpty) cityBits,
+    ];
+    if (lines.isEmpty) {
+      return null;
+    }
+    return lines.join('\n');
+  }
 
   factory StudentProfile.fromJson(Map<String, dynamic> json) {
     return StudentProfile(
@@ -45,6 +71,11 @@ class StudentProfile extends ActorProfile {
       lastName: json['last_name'] as String?,
       displayName: json['display_name'] as String,
       photoUrl: json['photo_url'] as String?,
+      phone: json['phone'] as String?,
+      birthDate: json['birth_date'] as String?,
+      residenceAddress: json['residence_address'] as String?,
+      residenceCityProvince: json['residence_city_province'] as String?,
+      residencePostalCode: json['residence_postal_code'] as String?,
       academyClass: _namedRefOrNull(json['academy_class']),
       academicYear: _namedRefOrNull(json['academic_year']),
     );
