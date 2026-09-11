@@ -1,20 +1,34 @@
 # Architecture
 
-AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student/parent/teacher schedule**, **teacher attendance marking**, and **student/parent attendance history**.
+AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student production shell** (Home / Orario / Presenze / Profilo), parent/teacher schedule, **teacher attendance marking**, and **student/parent attendance history**.
+
+## AUB Mobile Design References
+
+Visual source of truth: `Owiiiii1/AUB_admin` → `docs/ref`.
+
+- Student: `docs/ref/student/*` (`home`, `orario`, `presenze`, `profile`)
+- Parent / Teacher: separate production stages; their Stitch folders exist but are not implemented yet
+
+`DESIGN.md` and `code.html` supply color, type, spacing, radii, and component tokens. `screen.png` is the composition check. Stitch HTML is **reference only** — Flutter uses native widgets, not a web port.
+
+Functional source of truth remains the existing API contracts and Flutter architecture. No fake Stitch demo names in production UI.
 
 ## Layers
 
 | Layer | Responsibility |
 |--------|----------------|
-| `lib/app` | App widget, config, Italian UI strings |
+| `lib/app` | App widget, config, Italian UI strings, `ThemeData` |
+| `lib/app/theme` | Shared AUB tokens (colors, type, spacing) |
+| `lib/shared/widgets` | Reusable cards, badges, chrome, empty/error/loading |
 | `lib/core/api` | Dio client, JSON unwrap, `ApiException` |
 | `lib/core/storage` | Token persistence (`flutter_secure_storage`) |
 | `lib/features/auth/data` | Endpoints and session orchestration |
 | `lib/features/auth/models` | Typed `/me` and login models |
 | `lib/features/auth/state` | `AuthController` / `AuthState` |
 | `lib/features/auth/presentation` | Splash, login, offline-restore |
-| `lib/features/home/presentation` | Actor home + Orario / Presenze entry |
-| `lib/features/schedule` | API, repository, week state, schedule screen |
+| `lib/features/home` | Student shell + dashboard; parent/teacher entry homes |
+| `lib/features/profile` | Student profile + logout |
+| `lib/features/schedule` | API, repository, week state, schedule screens |
 | `lib/features/attendance` | Teacher marking + Student/Parent month history |
 
 UI never calls HTTP. UI never reads the token. Presentation talks to `AuthController` / `ScheduleController` / attendance controllers.
@@ -30,6 +44,18 @@ lib/
     app.dart
     app_config.dart
     app_strings.dart
+    theme/
+      aub_colors.dart
+      aub_typography.dart
+      aub_spacing.dart
+      aub_theme.dart
+  shared/
+    widgets/
+      aub_card.dart
+      aub_avatar.dart
+      aub_status_badge.dart
+      aub_feedback.dart
+      aub_chrome.dart
   core/
     api/
       api_client.dart
@@ -61,10 +87,19 @@ lib/
         restore_failed_screen.dart
         auth_messages.dart
     home/
+      data/
+        student_home_selectors.dart
+      state/
+        student_home_controller.dart
+        student_home_state.dart
       presentation/
+        student_shell.dart
         student_home_screen.dart
         parent_home_screen.dart
         teacher_home_screen.dart
+    profile/
+      presentation/
+        student_profile_screen.dart
     schedule/
       data/
         schedule_api.dart
@@ -121,4 +156,4 @@ main()
 `initializing` → splash  
 `unauthenticated` / `authenticating` → login  
 `restoreFailed` → retry (token kept)  
-`authenticated` → actor home → **Orario** / **Presenze** (student own / parent one child / teacher own lessons). Teacher lesson tap → marking **Presenze**.
+`authenticated` → student **shell** (Home / Orario / Presenze / Profilo) or parent/teacher home → **Orario** / **Presenze** (parent one child / teacher own lessons). Teacher lesson tap → marking **Presenze**.

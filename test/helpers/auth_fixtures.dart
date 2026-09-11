@@ -2,13 +2,16 @@ import 'package:aub/app/app_config.dart';
 import 'package:aub/core/api/api_client.dart';
 import 'package:aub/features/auth/data/auth_repository.dart';
 import 'package:aub/features/auth/state/auth_controller.dart';
-import 'package:aub/features/attendance/data/attendance_api.dart';
 import 'package:aub/features/attendance/data/attendance_history_repository.dart';
 import 'package:aub/features/attendance/data/attendance_repository.dart';
-import 'package:aub/features/schedule/data/schedule_api.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
+import 'package:aub/features/schedule/models/schedule_week.dart';
+import 'fake_attendance_api.dart';
 import 'fake_auth_api.dart';
+import 'fake_schedule_api.dart';
 import 'memory_token_storage.dart';
+import 'attendance_fixtures.dart';
+import 'schedule_fixtures.dart';
 
 const testApiBaseUrl = 'https://aub.owlsolutions.net/api/v1';
 
@@ -91,8 +94,17 @@ AuthHarness createHarness({String? storedToken}) {
   );
   final controller = AuthController(repository: repository);
   apiClient.onUnauthorized = controller.handleUnauthorized;
-  final scheduleRepository = ScheduleRepository(api: ScheduleApi(apiClient));
-  final attendanceApi = AttendanceApi(apiClient);
+  final scheduleApi = FakeScheduleApi()
+    ..responses['current'] = ScheduleWeekView.fromJson(unpublishedScheduleJson());
+  final attendanceApi = FakeAttendanceApi()
+    ..history = attendanceHistory(
+      marked: 0,
+      present: 0,
+      absent: 0,
+      excused: 0,
+      records: const [],
+    );
+  final scheduleRepository = ScheduleRepository(api: scheduleApi);
   final attendanceRepository = AttendanceRepository(api: attendanceApi);
   final attendanceHistoryRepository = AttendanceHistoryRepository(
     api: attendanceApi,
@@ -106,6 +118,8 @@ AuthHarness createHarness({String? storedToken}) {
     scheduleRepository: scheduleRepository,
     attendanceRepository: attendanceRepository,
     attendanceHistoryRepository: attendanceHistoryRepository,
+    scheduleApi: scheduleApi,
+    attendanceApi: attendanceApi,
   );
 }
 
@@ -119,6 +133,8 @@ class AuthHarness {
     required this.scheduleRepository,
     required this.attendanceRepository,
     required this.attendanceHistoryRepository,
+    required this.scheduleApi,
+    required this.attendanceApi,
   });
 
   final ApiClient apiClient;
@@ -129,4 +145,6 @@ class AuthHarness {
   final ScheduleRepository scheduleRepository;
   final AttendanceRepository attendanceRepository;
   final AttendanceHistoryRepository attendanceHistoryRepository;
+  final FakeScheduleApi scheduleApi;
+  final FakeAttendanceApi attendanceApi;
 }

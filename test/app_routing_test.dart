@@ -78,9 +78,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(StudentHomeScreen), findsOneWidget);
-    expect(find.text('Ciao, Mario Rossi'), findsOneWidget);
+    expect(find.text('CIAO, MARIO'), findsOneWidget);
     expect(find.textContaining('Prima A'), findsOneWidget);
     expect(find.textContaining('2026/2027'), findsOneWidget);
+    expect(find.byKey(const Key('student-nav-home')), findsOneWidget);
   });
 
   testWidgets('parent session shows parent home', (tester) async {

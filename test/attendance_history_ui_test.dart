@@ -3,8 +3,12 @@ import 'package:aub/features/attendance/data/attendance_history_repository.dart'
 import 'package:aub/features/attendance/presentation/attendance_history_screen.dart';
 import 'package:aub/features/attendance/state/attendance_history_controller.dart';
 import 'package:aub/features/auth/models/actor_profile.dart';
+import 'package:aub/features/auth/models/auth_session.dart';
 import 'package:aub/features/home/presentation/parent_home_screen.dart';
 import 'package:aub/features/home/presentation/student_home_screen.dart';
+import 'package:aub/features/home/presentation/student_shell.dart';
+import 'package:aub/features/schedule/data/schedule_repository.dart';
+import 'package:aub/features/schedule/models/schedule_week.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -12,6 +16,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'helpers/attendance_fixtures.dart';
 import 'helpers/auth_fixtures.dart';
 import 'helpers/fake_attendance_api.dart';
+import 'helpers/fake_schedule_api.dart';
+import 'helpers/schedule_fixtures.dart';
 
 void main() {
   setUpAll(() async {
@@ -19,24 +25,40 @@ void main() {
   });
 
   testWidgets('student home has Orario and Presenze', (tester) async {
-    var opened = false;
+    final me = MePayload.fromJson(studentMeJson(photoUrl: null));
+    final scheduleApi = FakeScheduleApi()
+      ..responses['current'] =
+          ScheduleWeekView.fromJson(unpublishedScheduleJson());
+    final attendanceApi = FakeAttendanceApi()
+      ..history = attendanceHistory(
+        marked: 0,
+        present: 0,
+        absent: 0,
+        excused: 0,
+        records: const [],
+      );
+
     await tester.pumpWidget(
       MaterialApp(
-        home: StudentHomeScreen(
-          profile: StudentProfile.fromJson(
-            studentMeJson(photoUrl: null)['profile'] as Map<String, dynamic>,
-          ),
+        home: StudentShell(
+          profile: me.profile as StudentProfile,
+          user: me.user,
           onLogout: () {},
-          onOpenAttendance: () => opened = true,
+          scheduleRepository: ScheduleRepository(api: scheduleApi),
+          attendanceHistoryRepository: AttendanceHistoryRepository(
+            api: attendanceApi,
+          ),
         ),
       ),
     );
+    await tester.pumpAndSettle();
 
-    expect(find.text(AppStrings.schedule), findsOneWidget);
-    expect(find.text(AppStrings.attendance), findsOneWidget);
-    await tester.tap(find.text(AppStrings.attendance));
-    await tester.pump();
-    expect(opened, isTrue);
+    expect(find.byType(StudentHomeScreen), findsOneWidget);
+    expect(find.text(AppStrings.schedule), findsWidgets);
+    expect(find.text(AppStrings.attendance), findsWidgets);
+    await tester.tap(find.byKey(const Key('student-nav-attendance')));
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.attendanceRegister.toUpperCase()), findsOneWidget);
   });
 
   testWidgets('parent child has Orario and Presenze', (tester) async {

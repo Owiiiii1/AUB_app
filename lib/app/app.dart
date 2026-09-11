@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:aub/app/app_strings.dart';
+import 'package:aub/app/theme/aub_theme.dart';
 import 'package:aub/features/attendance/data/attendance_history_repository.dart';
 import 'package:aub/features/attendance/data/attendance_repository.dart';
 import 'package:aub/features/attendance/presentation/attendance_history_screen.dart';
@@ -13,7 +14,7 @@ import 'package:aub/features/auth/presentation/splash_screen.dart';
 import 'package:aub/features/auth/state/auth_controller.dart';
 import 'package:aub/features/auth/state/auth_state.dart';
 import 'package:aub/features/home/presentation/parent_home_screen.dart';
-import 'package:aub/features/home/presentation/student_home_screen.dart';
+import 'package:aub/features/home/presentation/student_shell.dart';
 import 'package:aub/features/home/presentation/teacher_home_screen.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
 import 'package:aub/features/schedule/models/schedule_week.dart';
@@ -42,8 +43,6 @@ class AubApp extends StatefulWidget {
 }
 
 class _AubAppState extends State<AubApp> {
-  static const brandColor = Color(0xFF1A2B44);
-
   @override
   void initState() {
     super.initState();
@@ -56,16 +55,7 @@ class _AubAppState extends State<AubApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: AppStrings.appName,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: brandColor,
-          primary: brandColor,
-        ),
-        useMaterial3: true,
-        inputDecorationTheme: const InputDecorationTheme(
-          border: OutlineInputBorder(),
-        ),
-      ),
+      theme: buildAubTheme(),
       home: ListenableBuilder(
         listenable: widget.controller,
         builder: (context, _) {
@@ -92,11 +82,12 @@ class _AubAppState extends State<AubApp> {
     }
     final onLogout = widget.controller.logout;
     return switch (session.profile) {
-      StudentProfile profile => StudentHomeScreen(
+      StudentProfile profile => StudentShell(
           profile: profile,
+          user: session.user,
           onLogout: onLogout,
-          onOpenSchedule: () => _openSchedule(context),
-          onOpenAttendance: () => _openAttendanceHistory(context),
+          scheduleRepository: widget.scheduleRepository,
+          attendanceHistoryRepository: widget.attendanceHistoryRepository,
         ),
       ParentProfile profile => ParentHomeScreen(
           profile: profile,

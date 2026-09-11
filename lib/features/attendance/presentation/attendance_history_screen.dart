@@ -4,18 +4,24 @@ import 'package:intl/intl.dart';
 import 'package:aub/app/app_strings.dart';
 import 'package:aub/core/time/date_only.dart';
 import 'package:aub/features/attendance/models/attendance_models.dart';
+import 'package:aub/features/attendance/presentation/student_attendance_view.dart';
 import 'package:aub/features/attendance/state/attendance_history_controller.dart';
 import 'package:aub/features/attendance/state/attendance_history_state.dart';
+import 'package:aub/shared/widgets/aub_feedback.dart';
 
 class AttendanceHistoryScreen extends StatefulWidget {
   const AttendanceHistoryScreen({
     super.key,
     required this.controller,
     this.childName,
+    this.embedded = false,
+    this.studentVisuals = false,
   });
 
   final AttendanceHistoryController controller;
   final String? childName;
+  final bool embedded;
+  final bool studentVisuals;
 
   @override
   State<AttendanceHistoryScreen> createState() => _AttendanceHistoryScreenState();
@@ -41,41 +47,64 @@ class _AttendanceHistoryScreenState extends State<AttendanceHistoryScreen> {
         ? AppStrings.attendance
         : AppStrings.attendanceOf(widget.childName!);
 
+    final body = !_localeReady
+        ? const AubLoading()
+        : ListenableBuilder(
+            listenable: widget.controller,
+            builder: (context, _) {
+              final state = widget.controller.state;
+              return switch (state.status) {
+                AttendanceHistoryStatus.loading => const AubLoading(),
+                AttendanceHistoryStatus.error => AubErrorState(
+                    message: state.errorMessage ?? AppStrings.serverError,
+                    onRetry: widget.controller.retry,
+                  ),
+                AttendanceHistoryStatus.empty => _scaffold(
+                    history: state.history,
+                    child: widget.studentVisuals
+                        ? const AubEmptyState(
+                            message: AppStrings.noAttendanceThisMonth,
+                          )
+                        : const Padding(
+                            padding: EdgeInsets.all(24),
+                            child: Text(
+                              AppStrings.noAttendanceThisMonth,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                  ),
+                AttendanceHistoryStatus.loaded => _scaffold(
+                    history: state.history,
+                    child: widget.studentVisuals
+                        ? StudentAttendanceRecords(history: state.history!)
+                        : _HistoryBody(history: state.history!),
+                  ),
+              };
+            },
+          );
+
+    if (widget.embedded) {
+      return body;
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text(title)),
-      body: !_localeReady
-          ? const Center(child: CircularProgressIndicator())
-          : ListenableBuilder(
-              listenable: widget.controller,
-              builder: (context, _) {
-                final state = widget.controller.state;
-                return switch (state.status) {
-                  AttendanceHistoryStatus.loading => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  AttendanceHistoryStatus.error => _MessageState(
-                      message: state.errorMessage ?? AppStrings.serverError,
-                      onRetry: widget.controller.retry,
-                    ),
-                  AttendanceHistoryStatus.empty => _HistoryScaffold(
-                      history: state.history,
-                      controller: widget.controller,
-                      child: const Padding(
-                        padding: EdgeInsets.all(24),
-                        child: Text(
-                          AppStrings.noAttendanceThisMonth,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  AttendanceHistoryStatus.loaded => _HistoryScaffold(
-                      history: state.history,
-                      controller: widget.controller,
-                      child: _HistoryBody(history: state.history!),
-                    ),
-                };
-              },
-            ),
+      body: body,
+    );
+  }
+
+  Widget _scaffold({required AttendanceHistory? history, required Widget child}) {
+    if (widget.studentVisuals) {
+      return StudentAttendanceView(
+        history: history,
+        controller: widget.controller,
+        child: child,
+      );
+    }
+    return _HistoryScaffold(
+      history: history,
+      controller: widget.controller,
+      child: child,
     );
   }
 }
@@ -315,33 +344,6 @@ class _StatusBadge extends StatelessWidget {
       label: Text(label),
       visualDensity: VisualDensity.compact,
       backgroundColor: color,
-    );
-  }
-}
-
-class _MessageState extends StatelessWidget {
-  const _MessageState({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: onRetry,
-              child: const Text(AppStrings.retry),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
