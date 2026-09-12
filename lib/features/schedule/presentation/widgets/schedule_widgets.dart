@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:aub/app/app_strings.dart';
+import 'package:aub/core/time/clock.dart';
 import 'package:aub/core/time/date_only.dart';
 import 'package:aub/features/schedule/models/schedule_week.dart';
 
@@ -67,7 +68,7 @@ class ScheduleDaySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final today = DateTime.now();
+    final today = const AcademyClock().now();
     final isToday = isSameDate(day.date, today);
     final title = DateFormat("EEEE d MMMM", 'it').format(day.date);
     final capitalized =

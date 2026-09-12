@@ -32,6 +32,8 @@ class AppStrings {
   static const restoreOffline =
       'Connessione non disponibile. La sessione è ancora salvata.';
   static const homeTab = 'Home';
+  static const childrenTab = 'Figli';
+  static const calendarTab = 'Calendario';
   static const profileTab = 'Profilo';
   static const myProfile = 'Il mio profilo';
   static const schedule = 'Orario';
@@ -132,4 +134,48 @@ class AppStrings {
   static const pushHint = 'Avvisi su lezioni e presenze';
   static const pushUnavailable =
       'Le notifiche push saranno attive quando il servizio sarà disponibile.';
+
+  static const yourChildren = 'I tuoi figli';
+  static const upcomingCommitments = 'Prossimi impegni';
+  static const parentRole = 'Genitore';
+  static const changeStudent = 'Cambia allievo';
+  static const nextLessonToday = 'Prossima lezione oggi';
+  static const todayAtRest = 'Oggi a riposo';
+  static const attendanceSummary = 'Riepilogo presenze';
+  static const todaySchedule = 'Orario di oggi';
+  static const recentRecords = 'Ultime presenze registrate';
+  static const enrolledStudents = 'Allievi iscritti';
+  static const seeFullSchedule = 'Vedi orario completo';
+  static const seeFullAttendance = 'Vedi registro presenze';
+  static const noChildren =
+      'Nessun allievo associato a questo account.';
+  static const seeAll = 'Vedi tutti';
+
+  static String parentGreeting(String name, DateTime academyNow) {
+    final hour = academyNow.hour;
+    final hello = hour < 12
+        ? 'Buongiorno'
+        : hour < 18
+            ? 'Buon pomeriggio'
+            : 'Buonasera';
+    return '$hello, $name';
+  }
+
+  static String viewingChild(String name) => 'Stai visualizzando: $name';
+
+  static String enrolledCount(int count) {
+    if (count == 1) {
+      return 'Genitore · 1 allievo';
+    }
+    return 'Genitore · $count allievi';
+  }
+
+  static String pupilsCount(int count) {
+    if (count == 1) {
+      return '1 allievo';
+    }
+    return '$count allievi';
+  }
+
+  static String scheduleOfShort(String name) => 'Orario di $name';
 }

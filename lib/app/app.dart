@@ -3,17 +3,15 @@ import 'package:aub/app/app_strings.dart';
 import 'package:aub/app/theme/aub_theme.dart';
 import 'package:aub/features/attendance/data/attendance_history_repository.dart';
 import 'package:aub/features/attendance/data/attendance_repository.dart';
-import 'package:aub/features/attendance/presentation/attendance_history_screen.dart';
 import 'package:aub/features/attendance/presentation/attendance_screen.dart';
 import 'package:aub/features/attendance/state/attendance_controller.dart';
-import 'package:aub/features/attendance/state/attendance_history_controller.dart';
 import 'package:aub/features/auth/models/actor_profile.dart';
 import 'package:aub/features/auth/presentation/login_screen.dart';
 import 'package:aub/features/auth/presentation/restore_failed_screen.dart';
 import 'package:aub/features/auth/presentation/splash_screen.dart';
 import 'package:aub/features/auth/state/auth_controller.dart';
 import 'package:aub/features/auth/state/auth_state.dart';
-import 'package:aub/features/home/presentation/parent_home_screen.dart';
+import 'package:aub/features/home/presentation/parent_shell.dart';
 import 'package:aub/features/home/presentation/student_shell.dart';
 import 'package:aub/features/home/presentation/teacher_home_screen.dart';
 import 'package:aub/features/profile/data/profile_api.dart';
@@ -97,20 +95,14 @@ class _AubAppState extends State<AubApp> {
           profileApi: widget.profileApi,
           preferences: widget.profilePreferences,
         ),
-      ParentProfile profile => ParentHomeScreen(
+      ParentProfile profile => ParentShell(
           profile: profile,
+          user: session.user,
           onLogout: onLogout,
-          onOpenChildSchedule: (child) => _openSchedule(
-            context,
-            kind: ScheduleKind.child,
-            studentId: child.id,
-            childName: child.displayName,
-          ),
-          onOpenChildAttendance: (child) => _openAttendanceHistory(
-            context,
-            studentId: child.id,
-            childName: child.displayName,
-          ),
+          scheduleRepository: widget.scheduleRepository,
+          attendanceHistoryRepository: widget.attendanceHistoryRepository,
+          profileApi: widget.profileApi,
+          preferences: widget.profilePreferences,
         ),
       TeacherProfile profile => TeacherHomeScreen(
           profile: profile,
@@ -151,24 +143,6 @@ class _AubAppState extends State<AubApp> {
             repository: widget.attendanceRepository,
             lessonId: lesson.id,
           ),
-        ),
-      ),
-    );
-  }
-
-  void _openAttendanceHistory(
-    BuildContext context, {
-    int? studentId,
-    String? childName,
-  }) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => AttendanceHistoryScreen(
-          controller: AttendanceHistoryController(
-            repository: widget.attendanceHistoryRepository,
-            studentId: studentId,
-          ),
-          childName: childName,
         ),
       ),
     );

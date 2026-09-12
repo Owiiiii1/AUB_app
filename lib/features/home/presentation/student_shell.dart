@@ -107,46 +107,40 @@ class _StudentShellState extends State<StudentShell> {
 
     return Scaffold(
       backgroundColor: AubColors.surfaceIvory,
-      body: Column(
+      appBar: AubAppHeader(
+        title: _headerTitle,
+        profile: widget.profile,
+        onAvatarTap: () => setState(() => _tab = StudentNavTab.profile),
+      ),
+      body: IndexedStack(
+        index: _tab.index,
         children: [
-          AubAppHeader(
-            title: _headerTitle,
+          StudentHomeScreen(
             profile: widget.profile,
-            onAvatarTap: () => setState(() => _tab = StudentNavTab.profile),
+            controller: _homeController,
+            onOpenSchedule: () =>
+                setState(() => _tab = StudentNavTab.schedule),
+            onOpenAttendance: () =>
+                setState(() => _tab = StudentNavTab.attendance),
+            onOpenProfile: () =>
+                setState(() => _tab = StudentNavTab.profile),
           ),
-          Expanded(
-            child: IndexedStack(
-              index: _tab.index,
-              children: [
-                StudentHomeScreen(
-                  profile: widget.profile,
-                  controller: _homeController,
-                  onOpenSchedule: () =>
-                      setState(() => _tab = StudentNavTab.schedule),
-                  onOpenAttendance: () =>
-                      setState(() => _tab = StudentNavTab.attendance),
-                  onOpenProfile: () =>
-                      setState(() => _tab = StudentNavTab.profile),
-                ),
-                ScheduleScreen(
-                  controller: _scheduleController,
-                  embedded: true,
-                  studentVisuals: true,
-                ),
-                AttendanceHistoryScreen(
-                  controller: _historyController,
-                  embedded: true,
-                  studentVisuals: true,
-                ),
-                StudentProfileScreen(
-                  profile: widget.profile,
-                  user: widget.user,
-                  onLogout: widget.onLogout,
-                  profileApi: widget.profileApi,
-                  preferences: widget.preferences,
-                ),
-              ],
-            ),
+          ScheduleScreen(
+            controller: _scheduleController,
+            embedded: true,
+            studentVisuals: true,
+          ),
+          AttendanceHistoryScreen(
+            controller: _historyController,
+            embedded: true,
+            studentVisuals: true,
+          ),
+          StudentProfileScreen(
+            profile: widget.profile,
+            user: widget.user,
+            onLogout: widget.onLogout,
+            profileApi: widget.profileApi,
+            preferences: widget.preferences,
           ),
         ],
       ),

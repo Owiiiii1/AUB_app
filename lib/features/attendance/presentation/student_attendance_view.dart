@@ -81,9 +81,15 @@ class StudentAttendanceRecords extends StatelessWidget {
             padding: const EdgeInsets.only(top: 8, bottom: 6),
             child: Row(
               children: [
-                Text(
-                  italianWeekdayDateYear(parseDateOnly(entry.key)),
-                  style: AubText.headlineSm.copyWith(color: AubColors.textSecondary),
+                Flexible(
+                  child: Text(
+                    italianWeekdayDateYear(parseDateOnly(entry.key)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AubText.headlineSm.copyWith(
+                      color: AubColors.textSecondary,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 const Expanded(child: Divider(color: AubColors.borderMuted)),

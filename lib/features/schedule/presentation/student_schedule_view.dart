@@ -3,6 +3,7 @@ import 'package:aub/app/app_strings.dart';
 import 'package:aub/app/theme/aub_colors.dart';
 import 'package:aub/app/theme/aub_spacing.dart';
 import 'package:aub/app/theme/aub_typography.dart';
+import 'package:aub/core/time/clock.dart';
 import 'package:aub/core/time/date_only.dart';
 import 'package:aub/core/time/italian_dates.dart';
 import 'package:aub/core/time/lesson_time.dart';
@@ -71,7 +72,7 @@ class _WeekToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
+    final now = const AcademyClock().now();
     return Padding(
       padding: const EdgeInsets.fromLTRB(
         AubSpacing.margin,
@@ -223,7 +224,7 @@ class _StudentDaySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final today = isSameDate(day.date, DateTime.now());
+    final today = isSameDate(day.date, const AcademyClock().now());
     return Padding(
       padding: const EdgeInsets.only(bottom: AubSpacing.lg),
       child: Column(

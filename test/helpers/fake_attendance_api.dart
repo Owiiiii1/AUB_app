@@ -15,6 +15,7 @@ class FakeAttendanceApi extends AttendanceApi {
 
   AttendanceRoster? roster;
   AttendanceHistory? history;
+  final Map<int, AttendanceHistory> childHistories = {};
   Object? throwOnLoad;
   Object? throwOnSave;
   Object? throwOnHistory;
@@ -69,6 +70,6 @@ class FakeAttendanceApi extends AttendanceApi {
     if (throwOnHistory != null) {
       throw throwOnHistory!;
     }
-    return history!;
+    return childHistories[studentId] ?? history!;
   }
 }

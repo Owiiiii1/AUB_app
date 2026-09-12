@@ -32,6 +32,6 @@ class AubColors {
   static const alertBg = Color(0xFFFEE2E2);
 
   static const cardShadow = Color(0x0A0E1C2F);
-  static const navShadow = Color(0x0D000000);
+  static const navShadow = Color(0x330B192C);
   static const scrim = Color(0x660B192C);
 }

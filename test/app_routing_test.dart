@@ -98,9 +98,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(ParentHomeScreen), findsOneWidget);
-    expect(find.text('Maria Verdi'), findsOneWidget);
+    expect(find.textContaining('Maria'), findsWidgets);
     expect(find.text('Giulia Verdi'), findsOneWidget);
     expect(find.textContaining('Own Class'), findsOneWidget);
+    expect(find.byKey(const Key('parent-nav-home')), findsOneWidget);
   });
 
   testWidgets('teacher session shows teacher home', (tester) async {

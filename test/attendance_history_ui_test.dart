@@ -1,10 +1,11 @@
 import 'package:aub/app/app_strings.dart';
+import 'package:aub/core/time/clock.dart';
 import 'package:aub/features/attendance/data/attendance_history_repository.dart';
 import 'package:aub/features/attendance/presentation/attendance_history_screen.dart';
 import 'package:aub/features/attendance/state/attendance_history_controller.dart';
 import 'package:aub/features/auth/models/actor_profile.dart';
 import 'package:aub/features/auth/models/auth_session.dart';
-import 'package:aub/features/home/presentation/parent_home_screen.dart';
+import 'package:aub/features/home/presentation/parent_shell.dart';
 import 'package:aub/features/home/presentation/student_home_screen.dart';
 import 'package:aub/features/home/presentation/student_shell.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
@@ -62,24 +63,40 @@ void main() {
   });
 
   testWidgets('parent child has Orario and Presenze', (tester) async {
-    ParentChild? attendanceChild;
+    final me = MePayload.fromJson(parentMeJson());
+    final scheduleApi = FakeScheduleApi()
+      ..responses['current'] =
+          ScheduleWeekView.fromJson(unpublishedScheduleJson());
+    final attendanceApi = FakeAttendanceApi()
+      ..history = attendanceHistory(
+        marked: 0,
+        present: 0,
+        absent: 0,
+        excused: 0,
+        records: const [],
+      );
+
     await tester.pumpWidget(
       MaterialApp(
-        home: ParentHomeScreen(
-          profile: ParentProfile.fromJson(
-            parentMeJson()['profile'] as Map<String, dynamic>,
-          ),
+        home: ParentShell(
+          profile: me.profile as ParentProfile,
+          user: me.user,
           onLogout: () {},
-          onOpenChildAttendance: (child) => attendanceChild = child,
+          scheduleRepository: ScheduleRepository(api: scheduleApi),
+          attendanceHistoryRepository: AttendanceHistoryRepository(
+            api: attendanceApi,
+          ),
+          clock: AcademyClock(now: () => DateTime(2026, 9, 7, 10)),
         ),
       ),
     );
+    await tester.pumpAndSettle();
 
-    expect(find.text(AppStrings.schedule), findsOneWidget);
-    expect(find.text(AppStrings.attendance), findsOneWidget);
-    await tester.tap(find.text(AppStrings.attendance));
-    await tester.pump();
-    expect(attendanceChild?.displayName, 'Giulia Verdi');
+    expect(find.text(AppStrings.attendance), findsWidgets);
+    await tester.tap(find.byKey(const Key('parent-child-presenze-1')));
+    await tester.pumpAndSettle();
+    expect(find.byType(AttendanceHistoryScreen), findsOneWidget);
+    expect(find.text(AppStrings.attendanceOf('Giulia Verdi')), findsOneWidget);
   });
 
   testWidgets('history shows title summary records and statuses', (tester) async {

@@ -97,6 +97,14 @@ class ParentChild {
   final String displayName;
   final NamedRef? academyClass;
 
+  String get givenName {
+    final first = firstName?.trim();
+    if (first != null && first.isNotEmpty) {
+      return first;
+    }
+    return displayName;
+  }
+
   factory ParentChild.fromJson(Map<String, dynamic> json) {
     return ParentChild(
       id: json['id'] as int,
@@ -123,6 +131,14 @@ class ParentProfile extends ActorProfile {
   @override
   final String displayName;
   final List<ParentChild> children;
+
+  String get givenName {
+    final first = firstName?.trim();
+    if (first != null && first.isNotEmpty) {
+      return first;
+    }
+    return displayName;
+  }
 
   factory ParentProfile.fromJson(Map<String, dynamic> json) {
     final rawChildren = json['children'];

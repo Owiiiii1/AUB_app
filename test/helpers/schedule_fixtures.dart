@@ -3,6 +3,7 @@ Map<String, dynamic> publishedScheduleJson({
   String title = 'Danza classica',
   String startsAt = '16:00',
   String endsAt = '17:30',
+  List<Map<String, dynamic>>? extraLessons,
 }) {
   return {
     'student': {
@@ -33,6 +34,7 @@ Map<String, dynamic> publishedScheduleJson({
             },
             'status': status,
           },
+          ...?extraLessons,
         ],
       },
       for (var i = 1; i < 7; i++)

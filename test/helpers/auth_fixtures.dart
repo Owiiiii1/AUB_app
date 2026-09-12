@@ -43,7 +43,9 @@ Map<String, dynamic> studentMeJson({
   };
 }
 
-Map<String, dynamic> parentMeJson() {
+Map<String, dynamic> parentMeJson({
+  List<Map<String, dynamic>>? children,
+}) {
   return {
     'user': {
       'id': 11,
@@ -56,15 +58,16 @@ Map<String, dynamic> parentMeJson() {
       'first_name': 'Maria',
       'last_name': 'Verdi',
       'display_name': 'Maria Verdi',
-      'children': [
-        {
-          'id': 1,
-          'first_name': 'Giulia',
-          'last_name': 'Verdi',
-          'display_name': 'Giulia Verdi',
-          'academy_class': {'id': 3, 'name': 'Own Class'},
-        },
-      ],
+      'children': children ??
+          [
+            {
+              'id': 1,
+              'first_name': 'Giulia',
+              'last_name': 'Verdi',
+              'display_name': 'Giulia Verdi',
+              'academy_class': {'id': 3, 'name': 'Own Class'},
+            },
+          ],
     },
   };
 }

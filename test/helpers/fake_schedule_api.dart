@@ -12,6 +12,7 @@ class FakeScheduleApi extends ScheduleApi {
         );
 
   final Map<String, ScheduleWeekView> responses = {};
+  final Map<int, ScheduleWeekView> childResponses = {};
   Object? throwError;
   DateTime? lastWeek;
   int? lastStudentId;
@@ -41,7 +42,7 @@ class FakeScheduleApi extends ScheduleApi {
     if (throwError != null) {
       throw throwError!;
     }
-    return _viewFor(week);
+    return childResponses[studentId] ?? _viewFor(week);
   }
 
   @override

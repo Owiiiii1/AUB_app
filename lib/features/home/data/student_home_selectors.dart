@@ -58,3 +58,33 @@ List<({ScheduleDay day, ScheduleLesson lesson})> todaysLessons(
   }
   return const [];
 }
+
+List<UpcomingLesson> findUpcomingLessons(ScheduleWeekView? view, DateTime now) {
+  if (view == null || view.emptyReason != ScheduleEmptyReason.none) {
+    return const [];
+  }
+
+  final academyNow = toAcademyTime(now);
+  final items = <({UpcomingLesson upcoming, DateTime start})>[];
+  for (final day in view.days) {
+    for (final lesson in day.lessons) {
+      if (lesson.status == ScheduleLessonStatus.cancelled) {
+        continue;
+      }
+      if (lesson.status != ScheduleLessonStatus.published &&
+          lesson.status != ScheduleLessonStatus.moved) {
+        continue;
+      }
+      final start = academyLessonStart(day.date, lesson.startsAt);
+      if (start == null || !start.isAfter(academyNow)) {
+        continue;
+      }
+      items.add((
+        upcoming: UpcomingLesson(day: day, lesson: lesson),
+        start: start,
+      ));
+    }
+  }
+  items.sort((a, b) => a.start.compareTo(b.start));
+  return [for (final item in items) item.upcoming];
+}
