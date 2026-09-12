@@ -88,7 +88,7 @@ class ChildSwitcher extends StatelessWidget {
                 for (final child in children)
                   ListTile(
                     key: Key('parent-select-child-${child.id}'),
-                    leading: AubAvatar(size: 40, name: child.displayName),
+                    leading: AubAvatar(size: 40, name: child.displayName, photoUrl: child.photoUrl),
                     title: Text(child.displayName),
                     subtitle: child.academyClass == null
                         ? null

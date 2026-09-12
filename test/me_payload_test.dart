@@ -14,7 +14,7 @@ void main() {
     expect(profile.displayName, 'Mario Rossi');
     expect(profile.academyClass?.name, 'Prima A');
     expect(profile.academicYear?.name, '2026/2027');
-    expect(profile.photoUrl, 'https://aub.owlsolutions.net/storage/students/1.jpg');
+    expect(profile.photoUrl, 'https://aub.owlsolutions.net/api/v1/files/11111111-1111-1111-1111-111111111111');
     expect(profile.phone, '+39 333 120 8801');
     expect(profile.birthDate, '2009-04-18');
     expect(profile.formattedAddress, 'Via Padova 128\n20127 Milano (MI)');

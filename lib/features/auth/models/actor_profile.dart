@@ -88,6 +88,7 @@ class ParentChild {
     required this.firstName,
     required this.lastName,
     required this.displayName,
+    this.photoUrl,
     this.academyClass,
   });
 
@@ -95,6 +96,7 @@ class ParentChild {
   final String? firstName;
   final String? lastName;
   final String displayName;
+  final String? photoUrl;
   final NamedRef? academyClass;
 
   String get givenName {
@@ -111,6 +113,7 @@ class ParentChild {
       firstName: json['first_name'] as String?,
       lastName: json['last_name'] as String?,
       displayName: json['display_name'] as String,
+      photoUrl: json['photo_url'] as String?,
       academyClass: _namedRefOrNull(json['academy_class']),
     );
   }
@@ -166,6 +169,7 @@ class TeacherProfile extends ActorProfile {
     required this.firstName,
     required this.lastName,
     required this.displayName,
+    this.photoUrl,
   });
 
   final int id;
@@ -173,6 +177,7 @@ class TeacherProfile extends ActorProfile {
   final String? lastName;
   @override
   final String displayName;
+  final String? photoUrl;
 
   String get givenName {
     final first = firstName?.trim();
@@ -188,6 +193,7 @@ class TeacherProfile extends ActorProfile {
       firstName: json['first_name'] as String?,
       lastName: json['last_name'] as String?,
       displayName: json['display_name'] as String,
+      photoUrl: json['photo_url'] as String?,
     );
   }
 }

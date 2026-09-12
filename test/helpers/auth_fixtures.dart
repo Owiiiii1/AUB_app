@@ -17,7 +17,7 @@ const testApiBaseUrl = 'https://aub.owlsolutions.net/api/v1';
 
 Map<String, dynamic> studentMeJson({
   String displayName = 'Mario Rossi',
-  String? photoUrl = 'https://aub.owlsolutions.net/storage/students/1.jpg',
+  String? photoUrl = 'https://aub.owlsolutions.net/api/v1/files/11111111-1111-1111-1111-111111111111',
 }) {
   return {
     'user': {

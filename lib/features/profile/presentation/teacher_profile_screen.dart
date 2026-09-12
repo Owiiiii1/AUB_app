@@ -76,7 +76,7 @@ class _TeacherProfileScreenState extends State<TeacherProfileScreen> {
           ),
           child: Column(
             children: [
-              AubAvatar(size: 96, name: widget.profile.displayName),
+              AubAvatar(size: 96, name: widget.profile.displayName, photoUrl: widget.profile.photoUrl),
               const SizedBox(height: AubSpacing.sm),
               Text(
                 widget.profile.displayName,

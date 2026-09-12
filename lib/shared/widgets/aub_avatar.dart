@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:aub/app/theme/aub_colors.dart';
 import 'package:aub/app/theme/aub_typography.dart';
-import 'package:aub/core/media/safe_https_url.dart';
+import 'package:aub/core/media/authenticated_image.dart';
+import 'package:aub/core/media/authenticated_media_url.dart';
 
 class AubAvatar extends StatelessWidget {
   const AubAvatar({
@@ -20,22 +21,31 @@ class AubAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final initials = _initials(name);
-    final avatar = CircleAvatar(
+    final initialsText = Text(
+      initials,
+      style: AubText.labelMd.copyWith(
+        fontFamily: AubFonts.display,
+        fontSize: size * 0.34,
+        color: AubColors.navy,
+      ),
+    );
+    final placeholder = CircleAvatar(
       radius: size / 2,
       backgroundColor: AubColors.surfaceSubtle,
-      backgroundImage: isSafeHttpsUrl(photoUrl) ? NetworkImage(photoUrl!) : null,
-      onBackgroundImageError: isSafeHttpsUrl(photoUrl) ? (_, _) {} : null,
-      child: isSafeHttpsUrl(photoUrl)
-          ? null
-          : Text(
-              initials,
-              style: AubText.labelMd.copyWith(
-                fontFamily: AubFonts.display,
-                fontSize: size * 0.34,
-                color: AubColors.navy,
+      child: initialsText,
+    );
+    final avatar = isAuthenticatedMediaUrl(photoUrl)
+        ? SizedBox(
+            width: size,
+            height: size,
+            child: ClipOval(
+              child: AuthenticatedImage(
+                url: photoUrl!,
+                placeholder: placeholder,
               ),
             ),
-    );
+          )
+        : placeholder;
 
     if (!showActiveDot) {
       return avatar;

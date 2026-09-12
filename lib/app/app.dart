@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:aub/app/app_strings.dart';
+import 'package:aub/core/media/api_client_scope.dart';
 import 'package:aub/app/theme/aub_theme.dart';
 import 'package:aub/features/attendance/data/attendance_history_repository.dart';
 import 'package:aub/features/attendance/data/attendance_repository.dart';
@@ -51,7 +52,9 @@ class _AubAppState extends State<AubApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ApiClientScope(
+      client: widget.controller.apiClient,
+      child: MaterialApp(
       title: AppStrings.appName,
       theme: buildAubTheme(),
       home: ListenableBuilder(
@@ -69,6 +72,7 @@ class _AubAppState extends State<AubApp> {
             AuthStatus.authenticated => _authenticatedHome(context, state),
           };
         },
+      ),
       ),
     );
   }

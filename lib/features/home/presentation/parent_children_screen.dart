@@ -112,7 +112,7 @@ class _ChildrenLoaded extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AubAvatar(size: 80, name: selected.displayName),
+              AubAvatar(size: 80, name: selected.displayName, photoUrl: selected.photoUrl),
               const SizedBox(width: AubSpacing.md),
               Expanded(
                 child: Column(

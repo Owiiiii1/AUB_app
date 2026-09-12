@@ -44,7 +44,7 @@ class ChildCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AubAvatar(size: 56, name: child.displayName),
+              AubAvatar(size: 56, name: child.displayName, photoUrl: child.photoUrl),
               const SizedBox(width: AubSpacing.sm),
               Expanded(
                 child: Column(

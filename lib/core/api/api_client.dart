@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:aub/app/app_config.dart';
@@ -85,6 +86,48 @@ class ApiClient {
 
   Future<Map<String, dynamic>> delete(String path) {
     return _send(() => _dio.delete<dynamic>(path));
+  }
+
+  Future<Uint8List> getBytes(String pathOrUrl) async {
+    try {
+      final response = await _dio.get<List<int>>(
+        _relativePath(pathOrUrl),
+        options: Options(
+          responseType: ResponseType.bytes,
+          headers: const {'Accept': '*/*'},
+        ),
+      );
+      final data = response.data;
+      if (data == null) {
+        throw const ApiException(
+          code: ApiErrorCode.serverError,
+          message: 'Empty file.',
+        );
+      }
+      return Uint8List.fromList(data);
+    } on DioException catch (error) {
+      throw _mapDioException(error, false);
+    }
+  }
+
+  String _relativePath(String pathOrUrl) {
+    final base = _dio.options.baseUrl;
+    if (pathOrUrl.startsWith(base)) {
+      var rest = pathOrUrl.substring(base.length);
+      if (rest.startsWith('/')) {
+        rest = rest.substring(1);
+      }
+      return rest;
+    }
+    const marker = '/api/v1/';
+    final index = pathOrUrl.indexOf(marker);
+    if (index >= 0) {
+      return pathOrUrl.substring(index + marker.length);
+    }
+    if (pathOrUrl.startsWith('/')) {
+      return pathOrUrl.substring(1);
+    }
+    return pathOrUrl;
   }
 
   Future<Map<String, dynamic>> _send(

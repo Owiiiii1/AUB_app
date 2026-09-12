@@ -21,6 +21,8 @@ class AuthRepository {
   final AuthApi _authApi;
   final String Function() _deviceName;
 
+  ApiClient get apiClient => _apiClient;
+
   Future<AuthSession> login({
     required String email,
     required String password,

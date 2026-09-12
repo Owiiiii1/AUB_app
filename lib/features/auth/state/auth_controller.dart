@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:aub/app/app_strings.dart';
+import 'package:aub/core/api/api_client.dart';
 import 'package:aub/core/api/api_exception.dart';
 import 'package:aub/features/auth/data/auth_repository.dart';
 import 'package:aub/features/auth/models/api_user.dart';
@@ -15,6 +16,8 @@ class AuthController extends ChangeNotifier {
   bool _handlingUnauthorized = false;
 
   AuthState get state => _state;
+
+  ApiClient get apiClient => _repository.apiClient;
 
   Future<void> restoreSession() async {
     _setState(const AuthState.initializing());

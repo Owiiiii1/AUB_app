@@ -23,7 +23,7 @@ class ChildContextHeader extends StatelessWidget {
       padding: const EdgeInsets.all(AubSpacing.sm),
       child: Row(
         children: [
-          AubAvatar(size: 48, name: child.displayName),
+          AubAvatar(size: 48, name: child.displayName, photoUrl: child.photoUrl),
           const SizedBox(width: AubSpacing.sm),
           Expanded(
             child: Column(
