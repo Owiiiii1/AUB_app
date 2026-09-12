@@ -19,12 +19,14 @@ class StudentScheduleView extends StatelessWidget {
     required this.controller,
     this.banner,
     this.onLessonTap,
+    this.teacherVisuals = false,
   });
 
   final ScheduleWeekView view;
   final ScheduleController controller;
   final String? banner;
   final ValueChanged<ScheduleLesson>? onLessonTap;
+  final bool teacherVisuals;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +56,7 @@ class StudentScheduleView extends StatelessWidget {
                 (day) => _StudentDaySection(
                   day: day,
                   onLessonTap: onLessonTap,
+                  teacherVisuals: teacherVisuals,
                 ),
               ),
             ],
@@ -217,10 +220,15 @@ class _DayChip extends StatelessWidget {
 }
 
 class _StudentDaySection extends StatelessWidget {
-  const _StudentDaySection({required this.day, this.onLessonTap});
+  const _StudentDaySection({
+    required this.day,
+    this.onLessonTap,
+    this.teacherVisuals = false,
+  });
 
   final ScheduleDay day;
   final ValueChanged<ScheduleLesson>? onLessonTap;
+  final bool teacherVisuals;
 
   @override
   Widget build(BuildContext context) {
@@ -282,6 +290,7 @@ class _StudentDaySection extends StatelessWidget {
                 child: _StudentLessonCard(
                   lesson: lesson,
                   onTap: onLessonTap == null ? null : () => onLessonTap!(lesson),
+                  teacherVisuals: teacherVisuals,
                 ),
               ),
             ),
@@ -304,10 +313,15 @@ class StudentLessonCard extends StatelessWidget {
 }
 
 class _StudentLessonCard extends StatelessWidget {
-  const _StudentLessonCard({required this.lesson, this.onTap});
+  const _StudentLessonCard({
+    required this.lesson,
+    this.onTap,
+    this.teacherVisuals = false,
+  });
 
   final ScheduleLesson lesson;
   final VoidCallback? onTap;
+  final bool teacherVisuals;
 
   @override
   Widget build(BuildContext context) {
@@ -343,6 +357,7 @@ class _StudentLessonCard extends StatelessWidget {
       if (building != null && building.isNotEmpty) building,
     ].join(' · ');
     final teacher = lesson.teacher?.displayName;
+    final className = lesson.academyClass?.name;
 
     return AubCard(
       stripColor: strip,
@@ -373,6 +388,12 @@ class _StudentLessonCard extends StatelessWidget {
                         color: cancelled ? AubColors.textMuted : AubColors.textPrimary,
                       ),
                     ),
+                    if (teacherVisuals &&
+                        className != null &&
+                        className.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(className, style: AubText.headlineSm),
+                    ],
                   ],
                 ),
               ),
@@ -380,7 +401,7 @@ class _StudentLessonCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AubSpacing.sm),
-          if (teacher != null && teacher.isNotEmpty)
+          if (!teacherVisuals && teacher != null && teacher.isNotEmpty)
             Text(teacher, style: AubText.bodySm.copyWith(color: AubColors.textPrimary)),
           if (venue.isNotEmpty || duration != null)
             Padding(
@@ -399,6 +420,16 @@ class _StudentLessonCard extends StatelessWidget {
                 ],
               ),
             ),
+          if (teacherVisuals && onTap != null && !cancelled) ...[
+            const SizedBox(height: AubSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: onTap,
+                child: const Text(AppStrings.openAttendance),
+              ),
+            ),
+          ],
         ],
       ),
     );

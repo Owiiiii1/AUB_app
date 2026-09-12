@@ -25,6 +25,16 @@ class AppStrings {
   static const logoutConfirmAction = 'Conferma ed Esci';
   static const restoringSession = 'Ripristino della sessione…';
   static const teacherArea = 'Area docente';
+  static const teacherRole = 'Docente';
+  static const teacherMark = 'Docenti';
+  static const openAttendance = 'Apri presenze';
+  static const nowLabel = 'Adesso';
+  static const unmarked = 'Non segnato';
+  static const draftUnsaved = 'Modifiche non salvate';
+  static const noLessonsForAttendance =
+      'Nessuna lezione da registrare in questa settimana.';
+  static const noStudentsInLesson = 'Nessun allievo in questa lezione.';
+  static const lessonsOfToday = 'Le lezioni di oggi';
   static const classLabel = 'Classe';
   static const yearLabel = 'Anno accademico';
   static const childrenLabel = 'Figli';

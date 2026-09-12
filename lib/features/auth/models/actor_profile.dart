@@ -174,6 +174,14 @@ class TeacherProfile extends ActorProfile {
   @override
   final String displayName;
 
+  String get givenName {
+    final first = firstName?.trim();
+    if (first != null && first.isNotEmpty) {
+      return first;
+    }
+    return displayName;
+  }
+
   factory TeacherProfile.fromJson(Map<String, dynamic> json) {
     return TeacherProfile(
       id: json['id'] as int,

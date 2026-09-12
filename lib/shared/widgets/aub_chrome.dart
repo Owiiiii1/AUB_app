@@ -14,6 +14,7 @@ class AubAppHeader extends StatelessWidget implements PreferredSizeWidget {
     this.avatarName,
     this.photoUrl,
     this.onAvatarTap,
+    this.mark,
   });
 
   final String title;
@@ -21,6 +22,7 @@ class AubAppHeader extends StatelessWidget implements PreferredSizeWidget {
   final String? avatarName;
   final String? photoUrl;
   final VoidCallback? onAvatarTap;
+  final String? mark;
 
   @override
   Size get preferredSize => const Size.fromHeight(AubSpacing.appBar);
@@ -48,7 +50,7 @@ class AubAppHeader extends StatelessWidget implements PreferredSizeWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        AppStrings.academyMark.toUpperCase(),
+                        (mark ?? AppStrings.academyMark).toUpperCase(),
                         style: AubText.labelCaps,
                       ),
                       Text(
@@ -272,6 +274,104 @@ class ParentBottomNav extends StatelessWidget {
     return Expanded(
       child: InkWell(
         key: Key('parent-nav-${tab.name}'),
+        onTap: () => onSelect(tab),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: 3,
+              width: 22,
+              margin: const EdgeInsets.only(bottom: 4),
+              decoration: BoxDecoration(
+                color: isSelected ? AubColors.gold : Colors.transparent,
+                borderRadius: BorderRadius.circular(AubRadii.pill),
+              ),
+            ),
+            Icon(isSelected ? selectedIcon : icon, size: 22, color: color),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: AubText.labelSm.copyWith(
+                color: color,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+enum TeacherNavTab { today, schedule, attendance, profile }
+
+class TeacherBottomNav extends StatelessWidget {
+  const TeacherBottomNav({
+    super.key,
+    required this.selected,
+    required this.onSelect,
+  });
+
+  final TeacherNavTab selected;
+  final ValueChanged<TeacherNavTab> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AubColors.surfaceIvory,
+      elevation: 12,
+      shadowColor: AubColors.navShadow,
+      surfaceTintColor: Colors.transparent,
+      child: Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.paddingOf(context).bottom,
+        ),
+        child: SizedBox(
+          height: AubSpacing.bottomNav,
+          child: Row(
+            children: [
+              _item(
+                tab: TeacherNavTab.today,
+                icon: Icons.today_outlined,
+                selectedIcon: Icons.today,
+                label: AppStrings.today,
+              ),
+              _item(
+                tab: TeacherNavTab.schedule,
+                icon: Icons.schedule_outlined,
+                selectedIcon: Icons.schedule,
+                label: AppStrings.schedule,
+              ),
+              _item(
+                tab: TeacherNavTab.attendance,
+                icon: Icons.how_to_reg_outlined,
+                selectedIcon: Icons.how_to_reg,
+                label: AppStrings.attendance,
+              ),
+              _item(
+                tab: TeacherNavTab.profile,
+                icon: Icons.person_outline,
+                selectedIcon: Icons.person,
+                label: AppStrings.profileTab,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _item({
+    required TeacherNavTab tab,
+    required IconData icon,
+    required IconData selectedIcon,
+    required String label,
+  }) {
+    final isSelected = selected == tab;
+    final color = isSelected ? AubColors.navy : AubColors.textMuted;
+    return Expanded(
+      child: InkWell(
+        key: Key('teacher-nav-${tab.name}'),
         onTap: () => onSelect(tab),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

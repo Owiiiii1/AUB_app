@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:aub/app/app_strings.dart';
+import 'package:aub/app/theme/aub_colors.dart';
+import 'package:aub/app/theme/aub_spacing.dart';
+import 'package:aub/app/theme/aub_typography.dart';
 import 'package:aub/features/attendance/presentation/widgets/attendance_widgets.dart';
 import 'package:aub/features/attendance/state/attendance_controller.dart';
 import 'package:aub/features/attendance/state/attendance_state.dart';
+import 'package:aub/shared/widgets/aub_feedback.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key, required this.controller});
@@ -45,14 +49,13 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
           canPop: !blockPop,
           onPopInvokedWithResult: _onPopInvoked,
           child: Scaffold(
+            backgroundColor: AubColors.surfaceIvory,
             appBar: AppBar(
               title: Text(state.roster?.lesson.title ?? AppStrings.attendance),
             ),
             body: switch (state.status) {
-              AttendanceLoadStatus.loading => const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              AttendanceLoadStatus.error => _ErrorBody(
+              AttendanceLoadStatus.loading => const AubLoading(),
+              AttendanceLoadStatus.error => AubErrorState(
                   message: state.errorMessage ?? AppStrings.serverError,
                   onRetry: controller.retry,
                 ),
@@ -75,59 +78,114 @@ class _RosterBody extends StatelessWidget {
     final state = controller.state;
     final roster = state.roster;
     if (roster == null) {
-      return _ErrorBody(
+      return AubErrorState(
         message: AppStrings.serverError,
         onRetry: controller.retry,
       );
     }
     final editable = roster.editable && !state.saving;
     final cancelled = !roster.editable;
+    final students = roster.students;
 
     return Column(
       children: [
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            children: [
-              AttendanceHeader(lesson: roster.lesson, readOnly: cancelled),
-              if (state.errorMessage != null) ...[
-                const SizedBox(height: 12),
-                Text(
-                  state.errorMessage!,
-                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  AubSpacing.margin,
+                  AubSpacing.sm,
+                  AubSpacing.margin,
+                  0,
                 ),
-              ],
-              if (state.saveMessage != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  state.saveMessage!,
-                  style: Theme.of(context).textTheme.labelMedium,
-                ),
-              ],
-              const SizedBox(height: 16),
-              if (editable)
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                    onPressed: controller.markAllPresent,
-                    child: const Text(AppStrings.markAllPresent),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AttendanceHeader(
+                        lesson: roster.lesson,
+                        readOnly: cancelled,
+                      ),
+                      if (state.errorMessage != null) ...[
+                        const SizedBox(height: AubSpacing.sm),
+                        Text(
+                          state.errorMessage!,
+                          style: AubText.bodySm.copyWith(color: AubColors.alert),
+                        ),
+                      ],
+                      if (state.saveMessage != null) ...[
+                        const SizedBox(height: AubSpacing.xs),
+                        Text(
+                          state.saveMessage!,
+                          style: AubText.labelMd.copyWith(
+                            color: AubColors.success,
+                          ),
+                        ),
+                      ],
+                      if (controller.isDirty && editable) ...[
+                        const SizedBox(height: AubSpacing.xs),
+                        Text(
+                          AppStrings.draftUnsaved,
+                          style: AubText.labelSm.copyWith(
+                            color: AubColors.warning,
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: AubSpacing.md),
+                      Row(
+                        children: [
+                          Text(
+                            AppStrings.pupilsCount(students.length).toUpperCase(),
+                            style: AubText.labelCaps,
+                          ),
+                          const Spacer(),
+                          if (editable)
+                            TextButton(
+                              onPressed: controller.markAllPresent,
+                              child: const Text(AppStrings.markAllPresent),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: AubSpacing.xs),
+                    ],
                   ),
                 ),
-              const SizedBox(height: 8),
-              ...roster.students.map((student) {
-                return AttendanceStudentRow(
-                  student: student,
-                  selected: controller.statusOf(student),
-                  enabled: editable,
-                  onChanged: (status) {
-                    final current = controller.statusOf(student);
-                    controller.mark(
-                      student.id,
-                      current == status ? null : status,
-                    );
-                  },
-                );
-              }),
+              ),
+              if (students.isEmpty)
+                const SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: AubEmptyState(message: AppStrings.noStudentsInLesson),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AubSpacing.margin,
+                    0,
+                    AubSpacing.margin,
+                    AubSpacing.xl,
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final student = students[index];
+                        return AttendanceStudentRow(
+                          student: student,
+                          selected: controller.statusOf(student),
+                          enabled: editable,
+                          onChanged: (status) {
+                            final current = controller.statusOf(student);
+                            controller.mark(
+                              student.id,
+                              current == status ? null : status,
+                            );
+                          },
+                        );
+                      },
+                      childCount: students.length,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -142,33 +200,6 @@ class _RosterBody extends StatelessWidget {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _ErrorBody extends StatelessWidget {
-  const _ErrorBody({required this.message, required this.onRetry});
-
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 16),
-            FilledButton(
-              onPressed: onRetry,
-              child: const Text(AppStrings.retry),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

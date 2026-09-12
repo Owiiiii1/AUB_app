@@ -1,18 +1,18 @@
 # Architecture
 
-AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student and parent production shells**, teacher functional home, schedule, **teacher attendance marking**, and **student/parent attendance history**.
+AUB_app is the Flutter client for Accademia Umbra di Belle Arti. Auth foundation plus **student, parent, and teacher production shells**, schedule, **teacher attendance marking**, and **student/parent attendance history**.
 
 ## AUB Mobile Design References
 
 Visual source of truth: `Owiiiii1/AUB_admin` → `docs/ref`.
 
 - Student: `docs/ref/student/*` (`home`, `orario`, `presenze`, `profile`) — production-ready
-- Parent: `docs/ref/parent/*` (`home`, `children`, `orario`, `presenze`, `profile`)
-- Teacher: `docs/ref/teacher/*` — pending production UI
+- Parent: `docs/ref/parent/*` (`home`, `children`, `orario`, `presenze`, `profile`) — production-ready
+- Teacher: `docs/ref/teacher/*` (`today`, `orario`, `presenze`, `presenzeChilren`, `profile`) — production-ready
 
 `DESIGN.md` and `code.html` supply color, type, spacing, radii, and component tokens. `screen.png` is the composition check. If `DESIGN.md` and the screenshot diverge, screenshot + visual intent win. Stitch HTML is **reference only** — Flutter uses native widgets, not a web port.
 
-Functional source of truth remains the existing API contracts and Flutter architecture. No fake Stitch demo names in production UI. Student and Parent share one design system (`lib/app/theme`, `lib/shared/widgets`).
+Functional source of truth remains the existing API contracts and Flutter architecture. No fake Stitch demo names in production UI. Student, Parent, and Teacher share one design system (`lib/app/theme`, `lib/shared/widgets`).
 
 ## Layers
 
@@ -27,8 +27,8 @@ Functional source of truth remains the existing API contracts and Flutter archit
 | `lib/features/auth/models` | Typed `/me` and login models |
 | `lib/features/auth/state` | `AuthController` / `AuthState` |
 | `lib/features/auth/presentation` | Splash, login, offline-restore |
-| `lib/features/home` | Student/Parent shells + dashboards; teacher entry home |
-| `lib/features/profile` | Student/Parent profile + logout |
+| `lib/features/home` | Student / Parent / Teacher shells + dashboards |
+| `lib/features/profile` | Student / Parent / Teacher profile + logout |
 | `lib/features/schedule` | API, repository, week state, schedule screens |
 | `lib/features/attendance` | Teacher marking + Student/Parent month history |
 
@@ -39,6 +39,12 @@ There is no Riverpod, Bloc, GetX, or Provider. Controllers are `ChangeNotifier`.
 ## Parent child context
 
 Parent always has a selected child (`ParentShell._selectedChildId`). Home aggregates every child via `ParentHomeController` (one parallel fetch per child, then in-memory repository cache). Figli / Calendario / Presenze bind to the selected child. `ScheduleController.bindStudent` reloads and ignores stale in-flight responses. Cache keys already include `studentId`.
+
+## Teacher attendance flow
+
+Teacher shell: **Oggi / Orario / Presenze / Profilo**. Roster is a pushed screen from a schedule lesson (Today next-lesson CTA, Orario card, or Presenze worklist). `TeacherHomeController` loads `GET /api/v1/teacher/schedule` once via `ScheduleRepository`. Lesson IDs come only from that authorized payload.
+
+Attendance: GET roster → local draft → explicit **Salva** (changed rows only). `no AttendanceRecord` = unmarked, never absent. Statuses: present / absent / excused. Cancelled lessons are view-only. Unsaved back is confirmed. Completion “Presenze completate” is not shown: the API has no reliable full-roster completion flag.
 
 Academy day / next-lesson / Oggi use `AcademyClock` (`Europe/Rome`), not `DateTime.now()`.
 
@@ -91,17 +97,23 @@ lib/
         student_home_state.dart
         parent_home_controller.dart
         parent_home_state.dart
+        teacher_home_controller.dart
+        teacher_home_state.dart
       presentation/
         student_shell.dart
         student_home_screen.dart
         parent_shell.dart
         parent_home_screen.dart
         parent_children_screen.dart
+        teacher_shell.dart
         teacher_home_screen.dart
+        teacher_presenze_screen.dart
+        widgets/teacher_lesson_card.dart
     profile/
       presentation/
         student_profile_screen.dart
         parent_profile_screen.dart
+        teacher_profile_screen.dart
     schedule/
       ...
     attendance/
@@ -131,4 +143,4 @@ main()
 `initializing` → splash  
 `unauthenticated` / `authenticating` → login  
 `restoreFailed` → retry (token kept)  
-`authenticated` → student **shell** (Home / Orario / Presenze / Profilo) or parent **shell** (Home / Figli / Calendario / Profilo, Presenze as child-context screen) or teacher home → **Orario** / marking **Presenze**.
+`authenticated` → student **shell** (Home / Orario / Presenze / Profilo) or parent **shell** (Home / Figli / Calendario / Profilo, Presenze as child-context screen) or teacher **shell** (Oggi / Orario / Presenze / Profilo, roster as a pushed lesson screen).

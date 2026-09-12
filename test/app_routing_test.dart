@@ -118,7 +118,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(TeacherHomeScreen), findsOneWidget);
-    expect(find.text('Elena Bianchi'), findsOneWidget);
-    expect(find.text('Area docente'), findsOneWidget);
+    expect(find.textContaining('Elena'), findsWidgets);
+    expect(find.text('Docente'), findsWidgets);
+    expect(find.byKey(const Key('teacher-nav-today')), findsOneWidget);
   });
 }

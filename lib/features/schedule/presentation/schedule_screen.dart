@@ -96,6 +96,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           controller: widget.controller,
           banner: AppStrings.noClassSchedule,
           onLessonTap: widget.onLessonTap,
+          teacherVisuals: widget.controller.kind == ScheduleKind.teacher,
         );
       }
       return _WeekScaffold(
@@ -128,6 +129,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         controller: widget.controller,
         banner: banner,
         onLessonTap: widget.onLessonTap,
+        teacherVisuals: widget.controller.kind == ScheduleKind.teacher,
       );
     }
     return _WeekScaffold(

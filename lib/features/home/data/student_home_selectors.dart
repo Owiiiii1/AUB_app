@@ -88,3 +88,28 @@ List<UpcomingLesson> findUpcomingLessons(ScheduleWeekView? view, DateTime now) {
   items.sort((a, b) => a.start.compareTo(b.start));
   return [for (final item in items) item.upcoming];
 }
+
+bool isLessonOngoing(ScheduleDay day, ScheduleLesson lesson, DateTime now) {
+  if (lesson.status == ScheduleLessonStatus.cancelled) {
+    return false;
+  }
+  final start = academyLessonStart(day.date, lesson.startsAt);
+  final end = academyLessonStart(day.date, lesson.endsAt);
+  if (start == null || end == null) {
+    return false;
+  }
+  final academyNow = toAcademyTime(now);
+  return !academyNow.isBefore(start) && academyNow.isBefore(end);
+}
+
+List<({ScheduleDay day, ScheduleLesson lesson})> weekLessons(
+  ScheduleWeekView? view,
+) {
+  if (view == null || view.emptyReason == ScheduleEmptyReason.unpublished) {
+    return const [];
+  }
+  return [
+    for (final day in view.days)
+      for (final lesson in day.lessons) (day: day, lesson: lesson),
+  ];
+}

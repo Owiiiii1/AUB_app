@@ -3,8 +3,6 @@ import 'package:aub/app/app_strings.dart';
 import 'package:aub/app/theme/aub_theme.dart';
 import 'package:aub/features/attendance/data/attendance_history_repository.dart';
 import 'package:aub/features/attendance/data/attendance_repository.dart';
-import 'package:aub/features/attendance/presentation/attendance_screen.dart';
-import 'package:aub/features/attendance/state/attendance_controller.dart';
 import 'package:aub/features/auth/models/actor_profile.dart';
 import 'package:aub/features/auth/presentation/login_screen.dart';
 import 'package:aub/features/auth/presentation/restore_failed_screen.dart';
@@ -13,14 +11,10 @@ import 'package:aub/features/auth/state/auth_controller.dart';
 import 'package:aub/features/auth/state/auth_state.dart';
 import 'package:aub/features/home/presentation/parent_shell.dart';
 import 'package:aub/features/home/presentation/student_shell.dart';
-import 'package:aub/features/home/presentation/teacher_home_screen.dart';
+import 'package:aub/features/home/presentation/teacher_shell.dart';
 import 'package:aub/features/profile/data/profile_api.dart';
 import 'package:aub/features/profile/data/profile_preferences.dart';
 import 'package:aub/features/schedule/data/schedule_repository.dart';
-import 'package:aub/features/schedule/models/schedule_week.dart';
-import 'package:aub/features/schedule/presentation/schedule_screen.dart';
-import 'package:aub/features/schedule/schedule_kind.dart';
-import 'package:aub/features/schedule/state/schedule_controller.dart';
 
 class AubApp extends StatefulWidget {
   const AubApp({
@@ -104,47 +98,15 @@ class _AubAppState extends State<AubApp> {
           profileApi: widget.profileApi,
           preferences: widget.profilePreferences,
         ),
-      TeacherProfile profile => TeacherHomeScreen(
+      TeacherProfile profile => TeacherShell(
           profile: profile,
+          user: session.user,
           onLogout: onLogout,
-          onOpenSchedule: () => _openSchedule(context, kind: ScheduleKind.teacher),
+          scheduleRepository: widget.scheduleRepository,
+          attendanceRepository: widget.attendanceRepository,
+          profileApi: widget.profileApi,
+          preferences: widget.profilePreferences,
         ),
     };
-  }
-
-  void _openSchedule(
-    BuildContext context, {
-    ScheduleKind kind = ScheduleKind.student,
-    int? studentId,
-    String? childName,
-  }) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => ScheduleScreen(
-          controller: ScheduleController(
-            repository: widget.scheduleRepository,
-            kind: kind,
-            studentId: studentId,
-          ),
-          childName: childName,
-          onLessonTap: kind == ScheduleKind.teacher
-              ? (lesson) => _openAttendance(context, lesson)
-              : null,
-        ),
-      ),
-    );
-  }
-
-  void _openAttendance(BuildContext context, ScheduleLesson lesson) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => AttendanceScreen(
-          controller: AttendanceController(
-            repository: widget.attendanceRepository,
-            lessonId: lesson.id,
-          ),
-        ),
-      ),
-    );
   }
 }
